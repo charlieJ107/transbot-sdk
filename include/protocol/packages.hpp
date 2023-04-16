@@ -10,11 +10,10 @@
 namespace transbot_sdk
 {
 
-    enum SavePermanently : uint8_t
-    {
-        True = 0x00,
-        False = 0x5F
-    };
+#define ENABLE 0x01
+#define DISABLE 0x00
+#define SAVE 0x5F
+#define NOT_SAVE 0x00
 
     /**
      * @brief Adjusting the PID. For member P, I and D, they has been scale 1000 times as they are all decimal. The real
@@ -28,14 +27,13 @@ namespace transbot_sdk
         uint16_t P{};
         uint16_t I{};
         uint16_t D{};
-        SavePermanently save{};
+        uint8_t save{};
         uint8_t checksum{};
 
         void calculate_checksum()
         {
-            checksum = (length + function + P + I + D + (save == True ? 0x5F : 0x00)) % 256;
+            checksum = (length + function + P + I + D + save) % 256;
         }
-
     } PID_Adjust;
 
     /**
@@ -159,7 +157,7 @@ namespace transbot_sdk
         uint8_t enable{};
         // 0x00: save
         // 0x5F: Not save
-        SavePermanently save{};
+        uint8_t save{};
         uint8_t checksum{};
 
         void calculate_checksum()
