@@ -3,6 +3,7 @@
 
 #include <string>
 #include "data.hpp"
+#include "../src/protocol/protocol.hpp"
 
 
 namespace transbot_sdk
@@ -25,7 +26,7 @@ namespace transbot_sdk
          * @param linear_velocity -45-45
          * @param angular_velocity -200-200
          */
-        void set_chassis_motion(int linear_velocity, int angular_velocity);
+        void set_chassis_motion(uint8_t linear_velocity, uint16_t angular_velocity);
 
         /**
          * @brief Set the camara servo angle
@@ -136,6 +137,7 @@ namespace transbot_sdk
 
 
     private:
+        Protocol protocol;
     };
 } // transbot_sdk
 
