@@ -1,7 +1,5 @@
 #include "transbot_sdk.hpp"
 
-#include <iostream>
+#include "protocol/packages.hpp"
 
-void hello() {
-    std::cout << "Hello, World!" << std::endl;
-}
+

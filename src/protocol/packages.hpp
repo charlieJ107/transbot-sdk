@@ -1,7 +1,3 @@
-//
-// Created by Charlie on 08/03/2023.
-//
-
 #ifndef TRANSBOT_PACKAGES_HPP
 #define TRANSBOT_PACKAGES_HPP
 
@@ -578,5 +574,25 @@ namespace transbot_sdk
         }
     } Gyro_Assist_Response;
 
+    enum WriteFunction
+    {
+        SET_PID = 0x01,
+        SET_CHASSIS_MOTION = 0x02,
+        SET_PWM_SERVO = 0x03,
+        SET_LED_STRIP = 0x04,
+        SET_STRIP_EFFECT = 0x05,
+        SET_BEEP = 0x06,
+        SET_LIGHT = 0x07,
+        SET_AUTO_REPORT_DATA = 0x08,
+        SET_PWM_MOTOR = 0x09,
+        SET_MIN_VELOCITY = 0x0B,
+        SET_GYRO_ENABLE = 0x0C,
+        SET_CHASSIS_MOTOR = 0x0D,
+        SET_SERVO = 0x20,
+        SET_SERVO_ID = 0x21,
+        SET_SERVO_TORQUE = 0x22,
+        SET_ARM_MOTION = 0x23,
+        CLEAR_FLASH = 0xA0
+    };
 }
 #endif //TRANSBOT_PACKAGES_HPP

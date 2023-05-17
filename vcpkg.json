@@ -1,0 +1,10 @@
+{
+  "name" : "transbot-sdk",
+  "version-string" : "1.0.0",
+  "builtin-baseline" : "429c605af8dde2d1e4ec61728ce810361fa62263",
+  "dependencies" : [ {
+    "name" : "glog",
+    "version>=" : "0.6.0#2",
+    "$comment" : "    # this is heuristically generated, and may not be correct\n\n    find_package(glog CONFIG REQUIRED)\n\n    target_link_libraries(main PRIVATE glog::glog)\n"
+  } ]
+}
