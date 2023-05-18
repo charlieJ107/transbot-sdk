@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.10)
 project(transbot_sdk)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 
 find_package(glog CONFIG REQUIRED)
 
@@ -9,7 +9,9 @@ add_library(transbot_sdk
         SHARED
         src/transbot_sdk.cpp
         src/hardware/serial_device.cpp
-        src/protocol/protocol.cpp)
+        src/protocol/protocol.cpp
+        src/protocol/package.cpp
+        src/protocol/memory_pool.cpp)
 
 target_include_directories(transbot_sdk PUBLIC include)
 target_include_directories(transbot_sdk PRIVATE src)

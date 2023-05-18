@@ -15,21 +15,22 @@ namespace transbot_sdk
 
         ~SerialDevice() override;
 
-        bool Init() override;
+        bool init() override;
 
-        std::vector<uint8_t> Read() override;
+        size_t receive(uint8_t* buffer, size_t max_length)  override;
 
-        int Write(std::vector<uint8_t> buffer) override;
+        size_t send(uint8_t* buffer, size_t length) override;
 
     private:
         std::string port_name;
         int baud_rate;
         int serial_file_descriptor;
         struct termios serial_port_settings;
+        int max_retry_times;
 
-        bool OpenDevice();
+        bool open_device();
 
-        bool ConfigureDevice();
+        bool configure_device();
     };
 } // transbot_sdk
 

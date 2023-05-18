@@ -1,6 +1,6 @@
 #include "transbot_sdk.hpp"
 
-#include "protocol/packages.hpp"
+#include "protocol/package.hpp"
 
 namespace transbot_sdk
 {
@@ -19,8 +19,4 @@ namespace transbot_sdk
         return this->protocol.init();
     }
 
-    void Transbot::set_chassis_motion(uint8_t linear_velocity, uint16_t angular_velocity)
-    {
-        protocol.send();
-    }
 }

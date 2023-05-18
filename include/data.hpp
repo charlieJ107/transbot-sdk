@@ -1,6 +1,8 @@
 #ifndef TRANSBOT_SDK_DATA_HPP
 #define TRANSBOT_SDK_DATA_HPP
+
 #include <cstdint>
+
 namespace transbot_sdk
 {
     typedef struct _motion_info
@@ -22,5 +24,17 @@ namespace transbot_sdk
         uint16_t I{};
         uint16_t D{};
     } PID_Parameters;
+
+    enum TRANSBOT_ENABLE : uint8_t
+    {
+        DISABLE = 0x00,
+        ENABLE = 0x01
+    };
+
+    enum TRANSBOT_PERMANENT_SAVE : uint8_t
+    {
+        SAVE = 0x5F,
+        NOT_SAVE = 0x00
+    };
 }
 #endif //TRANSBOT_SDK_DATA_HPP

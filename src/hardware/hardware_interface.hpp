@@ -16,9 +16,9 @@ namespace transbot_sdk
     public:
         HardwareInterface() = default;
         virtual ~HardwareInterface() = default;
-        virtual std::vector<uint8_t> Read() = 0;
-        virtual int Write(std::vector<uint8_t> buffer) = 0;
-        virtual bool Init() = 0;
+        virtual size_t receive(uint8_t* buffer, size_t max_length) = 0;
+        virtual size_t send(uint8_t* buffer, size_t length) = 0;
+        virtual bool init() = 0;
     };
 
 } // transbot_sdk

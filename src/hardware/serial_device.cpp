@@ -5,9 +5,9 @@
 
 namespace transbot_sdk
 {
-    bool SerialDevice::Init()
+    bool SerialDevice::init()
     {
-        if (OpenDevice())
+        if (open_device())
         {
             LOG(INFO) << "Open serial device " << this->port_name << " successfully.";
         } else
@@ -18,7 +18,7 @@ namespace transbot_sdk
         return true;
     }
 
-    bool SerialDevice::OpenDevice()
+    bool SerialDevice::open_device()
     {
 #ifdef __arm__
         this->serial_file_descriptor = open(this->port_name.c_str(), O_RDWR | O_NBLOCK);
@@ -33,7 +33,7 @@ namespace transbot_sdk
         return true;
     }
 
-    bool SerialDevice::ConfigureDevice()
+    bool SerialDevice::configure_device()
     {
         if (tcgetattr(serial_file_descriptor, &this->serial_port_settings) != 0)
         {
@@ -48,32 +48,33 @@ namespace transbot_sdk
         this->port_name = port_name;
         this->baud_rate = baud_rate;
         this->serial_file_descriptor = -1;
+        this->serial_port_settings = {};
+        max_retry_times = 5;
     }
 
-    std::vector<uint8_t> SerialDevice::Read()
+    size_t SerialDevice::receive(uint8_t *buffer, size_t max_length)
     {
-        std::vector<uint8_t> result;
-        char temp_buffer[0x13];
-        int read_bytes = read(serial_file_descriptor, &temp_buffer, 0x13);
-        while (read_bytes)
+        if (buffer == nullptr)
         {
-            result.insert(result.end(), temp_buffer, temp_buffer + 0x13);
-            read_bytes = read(serial_file_descriptor, &temp_buffer, 0x13);
-        }
-        DLOG(INFO) << "Read data from serial device " << this->port_name << " successfully.";
-        return result;
-    }
-
-    int SerialDevice::Write(const std::vector<uint8_t> buffer)
-    {
-        int write_bytes = write(serial_file_descriptor, buffer.data(), buffer.size());
-        if (write_bytes < 0)
-        {
-            LOG(ERROR) << "Write data to serial device " << this->port_name << " failed.";
+            LOG(ERROR) << "Buffer is nullptr.";
             return -1;
         }
-        DLOG(INFO) << "Write data to serial device " << this->port_name << " successfully.";
-        return write_bytes;
+        size_t read_bytes = read(serial_file_descriptor, buffer, max_length);
+        while (read_bytes==0){
+            LOG(WARNING) << "Connection lost. Try to reconnect.";
+            while (!init()){
+                LOG(WARNING) << "Reconnect failed. Try again.";
+                usleep(1000000);
+            }
+            LOG(INFO) << "Reconnect successfully.";
+            read_bytes = read(serial_file_descriptor, buffer, max_length);
+        }
+        return read_bytes;
+    }
+
+    size_t SerialDevice::send(uint8_t *buffer, size_t length)
+    {
+        return write(serial_file_descriptor, buffer, length);
     }
 
     SerialDevice::~SerialDevice()
