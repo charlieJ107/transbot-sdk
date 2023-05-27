@@ -3,6 +3,7 @@
 
 #include <mutex>
 #include <memory>
+#include <thread>
 #include "package.hpp"
 #include "../hardware/hardware_interface.hpp"
 #include "memory_pool.hpp"
@@ -28,6 +29,13 @@ public:
 
 private:
     std::shared_ptr<transbot_sdk::HardwareInterface> m_hardware;
+
+    void receive_thread();
+
+    uint8_t *m_receive_buffer_ptr;
+    bool m_is_running = false;
+    std::thread m_receive_thread;
+    std::unordered_map<transbot_sdk::RECEIVE_FUNCTION, CircularBuffer<std::shared_ptr<transbot_sdk::Package>>> m_receive_buffer;
 //    std::mutex m_mutex;
 };
 

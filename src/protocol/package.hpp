@@ -515,10 +515,20 @@ namespace transbot_sdk
     class Package
     {
     public:
+        Package();
+
         Package(Direction direction, FUNCTION_TYPE function);
+
+        Package(Package const &aPackage);
 
         ~Package();
 
+        /**
+         * @brief Set data to package
+         * The data should be a pointer to the entire package data, not just the parameters data
+         * @param data_to_set The data to set
+         * @return
+         */
         bool set_data(uint8_t *data_to_set);
 
         bool is_data_set() const;
@@ -526,7 +536,9 @@ namespace transbot_sdk
         uint8_t get_length() const;
 
         uint8_t *get_data_ptr();
+
         Direction get_direction() const;
+
         FUNCTION_TYPE get_function() const;
 
     private:
@@ -540,5 +552,8 @@ namespace transbot_sdk
         bool data_set;
         std::mutex data_mutex;
     };
+
+    const int MAX_PACKAGE_LEN = 0x13;
+    const int CIRCLE_BUFFER_SIZE = 10;
 }
 #endif //TRANSBOT_PACKAGES_HPP

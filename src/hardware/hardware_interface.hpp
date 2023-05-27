@@ -15,9 +15,29 @@ namespace transbot_sdk
     {
     public:
         HardwareInterface() = default;
+
         virtual ~HardwareInterface() = default;
-        virtual size_t receive(uint8_t* buffer, size_t max_length) = 0;
-        virtual size_t send(uint8_t* buffer, size_t length) = 0;
+
+        /**
+         * @brief Receive data from hardware
+         * @param buffer A created buffer to store received data
+         * @param max_length Max length of the buffer
+         * @return Length of the received data
+         */
+        virtual size_t receive(uint8_t *buffer, size_t max_length) = 0;
+
+        /**
+         * @brief Send data to hardware
+         * @param buffer buffer to send
+         * @param length length of the buffer
+         * @return Length of the sent data
+         */
+        virtual size_t send(uint8_t *buffer, size_t length) = 0;
+
+        /**
+         * @brief Initialize hardware
+         * @return true if success
+         */
         virtual bool init() = 0;
     };
 

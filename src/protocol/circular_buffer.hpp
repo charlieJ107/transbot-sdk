@@ -37,26 +37,27 @@ public:
 
         full = head == tail;
     }
+
     /**
      * @brief pop the data from the buffer and get the popped item
      * @param item Item to be popped from the buffer
      * @return True if buffer is not empty
      */
-    bool pop(T &item)
+    T pop()
     {
         std::lock_guard<std::mutex> lock(mutex);
 
-        if(is_empty())
+        if (is_empty())
         {
-            return false;
+            throw std::length_error("Buffer is empty");
         }
 
         //Read data and advance the tail (we now have a free space)
-        item = buffer[tail];
+        auto item = buffer[tail];
         full = false;
         tail = (tail + 1) % max_size;
 
-        return true;
+        return item;
     }
     /**
      * @brief reset the buffer

@@ -6,7 +6,6 @@ namespace transbot_sdk
 {
     Transbot::Transbot()
     {
-        this->protocol = Protocol();
     }
 
     Transbot::~Transbot()
