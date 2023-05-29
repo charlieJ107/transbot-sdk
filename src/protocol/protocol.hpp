@@ -17,7 +17,7 @@
 class Protocol
 {
 public:
-    Protocol() = default;
+    Protocol();
 
     ~Protocol();
 
@@ -33,10 +33,9 @@ private:
     void receive_thread();
 
     uint8_t *m_receive_buffer_ptr;
-    bool m_is_running = false;
+    bool m_is_running;
     std::thread m_receive_thread;
     std::unordered_map<transbot_sdk::RECEIVE_FUNCTION, CircularBuffer<std::shared_ptr<transbot_sdk::Package>>> m_receive_buffer;
-//    std::mutex m_mutex;
 };
 
 #endif //TRANSBOT_SDK_PROTOCOL_HPP

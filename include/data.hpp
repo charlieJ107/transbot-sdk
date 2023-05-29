@@ -7,22 +7,22 @@ namespace transbot_sdk
 {
     typedef struct _motion_info
     {
-        uint8_t linear_velocity{};
-        uint16_t angular_velocity{};
-        uint16_t x_acceleration{};
-        uint16_t y_acceleration{};
-        uint16_t z_acceleration{};
-        uint16_t x_gyro{};
-        uint16_t y_gyro{};
-        uint16_t z_gyro{};
-        uint8_t battery_voltage{};
+        int linear_velocity{};
+        int angular_velocity{};
+        int x_acceleration{};
+        int y_acceleration{};
+        int z_acceleration{};
+        int x_gyro{};
+        int y_gyro{};
+        int z_gyro{};
+        int battery_voltage{};
     } Motion_Info;
 
     typedef struct _pid_parameters
     {
-        uint16_t P{};
-        uint16_t I{};
-        uint16_t D{};
+        double P{};
+        double I{};
+        double D{};
     } PID_Parameters;
 
     enum TRANSBOT_ENABLE : uint8_t
@@ -35,6 +35,19 @@ namespace transbot_sdk
     {
         SAVE = 0x5F,
         NOT_SAVE = 0x00
+    };
+
+    enum TRANSBOT_CAMARA_CHANNEL : uint8_t
+    {
+        HORIZONTAL = 0x01,
+        VERTICAL = 0x02,
+    };
+
+    enum TRANSBOT_ARM_SERVO_ID : uint8_t
+    {
+        JOINT1 = 0x07,
+        JOINT2 = 0x08,
+        JOINT3 = 0x09,
     };
 }
 #endif //TRANSBOT_SDK_DATA_HPP

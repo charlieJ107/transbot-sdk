@@ -45,11 +45,7 @@ namespace transbot_sdk
         const uint16_t header = 0xFFFE;
         const uint8_t length = 0x05;
         const uint8_t function = 0x03;
-        enum Servo_ID : uint8_t
-        {
-            yaw = 0x01,
-            pinch = 0x02
-        } servo_id{};
+        transbot_sdk::TRANSBOT_CAMARA_CHANNEL servo_id{};
         uint8_t angle{}; //< When using depth camara, the angle is limited in [50-130], otherwise [0-180]
         uint8_t checksum{};
     } PWM_Servo_Control;
@@ -179,7 +175,7 @@ namespace transbot_sdk
         const uint8_t length = 0x04;
         const uint8_t function = 0x0D;
         // -45- +45
-        uint8_t velocity{};
+        int8_t velocity{};
         uint8_t checksum{};
     } Forward;
 

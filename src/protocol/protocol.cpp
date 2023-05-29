@@ -10,14 +10,8 @@ bool Protocol::init()
         LOG(FATAL) << "Hardware init failed.";
         return false;
     }
-    m_receive_buffer_ptr = new uint8_t[transbot_sdk::MAX_PACKAGE_LEN];
     // Start a thread to receive data from hardware
     m_receive_thread = std::thread(&Protocol::receive_thread, this);
-    m_receive_buffer =
-            std::unordered_map<
-                    transbot_sdk::RECEIVE_FUNCTION,
-                    CircularBuffer<std::shared_ptr<transbot_sdk::Package>>
-            >();
     return true;
 }
 
@@ -155,3 +149,17 @@ void Protocol::receive_thread()
     }
 
 }
+
+Protocol::Protocol()
+{
+    m_is_running = false;
+    m_receive_buffer_ptr = new uint8_t[transbot_sdk::MAX_PACKAGE_LEN];
+    m_receive_buffer =
+            std::unordered_map<
+                    transbot_sdk::RECEIVE_FUNCTION,
+                    CircularBuffer<std::shared_ptr<transbot_sdk::Package>>
+            >();
+
+}
+
+

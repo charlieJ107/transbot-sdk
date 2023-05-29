@@ -11,9 +11,9 @@ namespace transbot_sdk
     class Transbot
     {
     public:
-        Transbot();
+        Transbot() = default;
 
-        ~Transbot();
+        ~Transbot() = default;
 
         /**
          * @brief Initialize the transbot sdk
@@ -26,14 +26,14 @@ namespace transbot_sdk
          * @param linear_velocity -45-45
          * @param angular_velocity -200-200
          */
-        void set_chassis_motion(uint8_t linear_velocity, uint16_t angular_velocity);
+        void set_chassis_motion(int linear_velocity, int angular_velocity);
 
         /**
          * @brief Set the camara servo angle
          * @param channel 0x01: horizontal, 0x02: vertical, if using depth camera, 0x01: depth
-         * @param pwm 50-130
+         * @param angle 50-130
          */
-        void set_camara_angle(int channel, int pwm);
+        void set_camara_angle(transbot_sdk::TRANSBOT_CAMARA_CHANNEL channel, int angle);
 
         /**
          * @brief Set the led strip color
@@ -47,7 +47,7 @@ namespace transbot_sdk
         /**
          * @brief Set the led strip effect
          * @param effect Effect id, 0-6
-         * @param velocity 1-10
+         * @param velocity 1-10, bigger for faster
          * @param param Effect parameter, 0-6
          * @note Effect id: 0: static, 1: blink, 2: breath, 3: color wipe, 4: color wipe random, 5: random color, 6: single dynamic
          */
@@ -55,7 +55,7 @@ namespace transbot_sdk
 
         /**
          * @brief Set the buzzer beep
-         * @param duration 0 for stop, 1 for continue, >1 for duration
+         * @param duration 0 for stop, 1 for continue, >1 for duration (shutdown after duration * 10ms)
          */
         void set_beep(int duration);
 
@@ -85,16 +85,17 @@ namespace transbot_sdk
 
         /**
          * @brief Set the servo angle
-         * @param channel 0x01: horizontal, 0x02: vertical, if using depth camera, 0x01: depth
+         * @param servoId 0x07: joint1, 0x08: joint2, 0x09: joint3
          * @param angle 0-180
+         * @param speed 0 for max speed, bigger for slower
          */
-        void set_single_arm_servo_angle(int channel, int angle);
+        void set_single_arm_servo_angle(TRANSBOT_ARM_SERVO_ID servoId, int angle, int speed = 100);
 
         /**
          * @brief Set the servo angle
-         * @param joint1  96-4000
-         * @param joint2 96-4000
-         * @param joint3 96-4000
+         * @param joint1  0-225
+         * @param joint2 30-270
+         * @param joint3 30-180
          * @param speed 0 for max speed, bigger for slower
          */
         void set_all_arm_servo_angle(int joint1, int joint2, int joint3, int speed);
@@ -138,6 +139,9 @@ namespace transbot_sdk
 
     private:
         Protocol protocol;
+        int angle_offset[3] = {0, 0, 0};
+
+        uint16_t angle_to_pwm(int angle, TRANSBOT_ARM_SERVO_ID servoId);
     };
 } // transbot_sdk
 
