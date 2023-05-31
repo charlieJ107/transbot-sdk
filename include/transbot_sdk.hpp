@@ -4,6 +4,7 @@
 #include <string>
 #include "data.hpp"
 #include "../src/protocol/protocol.hpp"
+#include "glog/logging.h"
 
 
 namespace transbot_sdk
@@ -11,7 +12,13 @@ namespace transbot_sdk
     class Transbot
     {
     public:
-        Transbot() = default;
+        Transbot()
+        {
+            if (!google::IsGoogleLoggingInitialized())
+            {
+                google::InitGoogleLogging("transbot_sdk");
+            }
+        }
 
         ~Transbot() = default;
 

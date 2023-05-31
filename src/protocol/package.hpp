@@ -45,7 +45,7 @@ namespace transbot_sdk
         const uint16_t header = 0xFFFE;
         const uint8_t length = 0x05;
         const uint8_t function = 0x03;
-        transbot_sdk::TRANSBOT_CAMARA_CHANNEL servo_id{};
+        uint8_t servo_id{};
         uint8_t angle{}; //< When using depth camara, the angle is limited in [50-130], otherwise [0-180]
         uint8_t checksum{};
     } PWM_Servo_Control;

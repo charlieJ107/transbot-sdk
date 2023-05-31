@@ -1,6 +1,19 @@
 #include <thread>
 #include "protocol.hpp"
 #include "glog/logging.h"
+#include "hardware/serial_device.hpp"
+
+Protocol::Protocol()
+{
+    m_hardware = std::make_shared<transbot_sdk::SerialDevice>();
+    m_is_running = false;
+    m_receive_buffer_ptr = new uint8_t[transbot_sdk::MAX_PACKAGE_LEN];
+    m_receive_buffer =
+            std::unordered_map<
+                    transbot_sdk::RECEIVE_FUNCTION,
+                    CircularBuffer<std::shared_ptr<transbot_sdk::Package>>
+            >();
+}
 
 bool Protocol::init()
 {
@@ -147,18 +160,6 @@ void Protocol::receive_thread()
             LOG(WARNING) << "Invalid data received from hardware, returned bytes: " << receive << ".";
         }
     }
-
-}
-
-Protocol::Protocol()
-{
-    m_is_running = false;
-    m_receive_buffer_ptr = new uint8_t[transbot_sdk::MAX_PACKAGE_LEN];
-    m_receive_buffer =
-            std::unordered_map<
-                    transbot_sdk::RECEIVE_FUNCTION,
-                    CircularBuffer<std::shared_ptr<transbot_sdk::Package>>
-            >();
 
 }
 

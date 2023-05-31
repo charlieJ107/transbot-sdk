@@ -335,6 +335,9 @@ namespace transbot_sdk
                 return (3100 - 900) * (angle - angle_offset[1] - 90 - 180) / (-180) + 900;
             case TRANSBOT_ARM_SERVO_ID::JOINT3:
                 return (3100 - 900) * (angle + angle_offset[2]) / 180 + 900;
+            default:
+                LOG(ERROR) << "Servo id out of range: " << servoId;
+                return 100;
         }
     }
 

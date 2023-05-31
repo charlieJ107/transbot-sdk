@@ -37,9 +37,10 @@ namespace transbot_sdk
     {
         if (tcgetattr(serial_file_descriptor, &this->serial_port_settings) != 0)
         {
-            LOG(ERROR) << "Get serial port settings failed.";
+            LOG(FATAL) << "Get serial port settings failed.";
             return false;
         }
+        return true;
     }
 
 

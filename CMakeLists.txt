@@ -13,10 +13,11 @@ add_library(transbot_sdk
         src/protocol/package.cpp
         src/protocol/memory_pool.cpp)
 
+add_executable(example example/src/main.cpp)
+
 target_include_directories(transbot_sdk PUBLIC include)
 target_include_directories(transbot_sdk PRIVATE src)
-target_link_libraries(transbot_sdk PRIVATE glog::glog)
 
-add_executable(example example/src/main.cpp)
-target_link_libraries(example PUBLIC transbot_sdk)
+target_link_libraries(transbot_sdk PRIVATE glog::glog)
 target_link_libraries(example PRIVATE glog::glog)
+target_link_libraries(example PUBLIC transbot_sdk)
