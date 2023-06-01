@@ -56,7 +56,7 @@ bool Protocol::send(const std::shared_ptr<transbot_sdk::Package> &package)
     }
     size_t sent_bytes = m_hardware->send(package->get_data_ptr(), package->get_length());
 
-    if (sent_bytes == -1 || sent_bytes != package->get_length())
+    if (sent_bytes<=0 || sent_bytes != package->get_length())
     {
         LOG(ERROR) << "Package is not sent completely.";
         return false;

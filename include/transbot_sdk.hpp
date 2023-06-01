@@ -14,10 +14,8 @@ namespace transbot_sdk
     public:
         Transbot()
         {
-            if (!google::IsGoogleLoggingInitialized())
-            {
-                google::InitGoogleLogging("transbot_sdk");
-            }
+            // This should be called in main function according to glog documentation
+            // google::InitGoogleLogging("transbot_sdk");
         }
 
         ~Transbot() = default;

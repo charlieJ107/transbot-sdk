@@ -35,7 +35,7 @@ MemoryBlock *MemoryPool::alloc(uint16_t size)
     // Calculate the in_use memory size and get the in_use index array
     uint16_t memory_size_in_use = 0;
     uint16_t in_use_blocks_num = 0;
-    uint16_t index_of_blocks_in_use[blocks_nums_in_table];
+    uint16_t* index_of_blocks_in_use = new uint16_t[blocks_nums_in_table];
     for (uint16_t i = 0; i < blocks_nums_in_table; i++)
     {
         if (blocks_table[i].in_use)
@@ -171,6 +171,7 @@ MemoryBlock *MemoryPool::alloc(uint16_t size)
                 return &blocks_table[i];
             }
         }
+        delete[] index_of_blocks_in_use;
         return nullptr;
     }
 

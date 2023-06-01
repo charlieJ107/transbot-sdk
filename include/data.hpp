@@ -7,22 +7,27 @@ namespace transbot_sdk
 {
     typedef struct _motion_info
     {
-        int linear_velocity{};
-        int angular_velocity{};
-        int x_acceleration{};
-        int y_acceleration{};
-        int z_acceleration{};
-        int x_gyro{};
-        int y_gyro{};
-        int z_gyro{};
-        int battery_voltage{};
+        int linear_velocity;
+        int angular_velocity;
+        int x_acceleration;
+        int y_acceleration;
+        int z_acceleration;
+        int x_gyro;
+        int y_gyro;
+        int z_gyro;
+        int battery_voltage;
+        _motion_info(int linear_velocity, int angular_velocity, int x_acceleration, int y_acceleration,
+                     int z_acceleration, int x_gyro, int y_gyro, int z_gyro, int battery_voltage) : linear_velocity(linear_velocity), angular_velocity(angular_velocity),
+                                                                                                    x_acceleration(x_acceleration), y_acceleration(y_acceleration), z_acceleration(z_acceleration),
+                                                                                                    x_gyro(x_gyro), y_gyro(y_gyro), z_gyro(z_gyro), battery_voltage(battery_voltage) {}
     } Motion_Info;
 
     typedef struct _pid_parameters
     {
-        double P{};
-        double I{};
-        double D{};
+        double P;
+        double I;
+        double D;
+        _pid_parameters(double P, double I, double D) : P(P), I(I), D(D) {}
     } PID_Parameters;
 
     enum TRANSBOT_ENABLE : uint8_t
@@ -50,4 +55,4 @@ namespace transbot_sdk
         JOINT3 = 0x09,
     };
 }
-#endif //TRANSBOT_SDK_DATA_HPP
+#endif // TRANSBOT_SDK_DATA_HPP

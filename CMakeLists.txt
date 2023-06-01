@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 project(transbot_sdk)
 
 set(CMAKE_CXX_STANDARD 14)
-
-find_package(glog CONFIG REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(glog REQUIRED libglog)
 
 add_library(transbot_sdk
         SHARED
@@ -16,8 +16,8 @@ add_library(transbot_sdk
 add_executable(example example/src/main.cpp)
 
 target_include_directories(transbot_sdk PUBLIC include)
-target_include_directories(transbot_sdk PRIVATE src)
+target_include_directories(transbot_sdk PRIVATE src ${glog_INCLUDE_DIRECTORY})
 
-target_link_libraries(transbot_sdk PRIVATE glog::glog)
-target_link_libraries(example PRIVATE glog::glog)
+target_link_libraries(transbot_sdk PRIVATE ${glog_LIBRARIES})
+target_link_libraries(example PRIVATE ${glog_LIBRARIES})
 target_link_libraries(example PUBLIC transbot_sdk)

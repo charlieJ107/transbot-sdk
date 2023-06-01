@@ -31,10 +31,9 @@ public:
      */
     explicit MemoryPool(uint16_t max_block_size = 1024,
                         uint16_t memory_size = 1024,
-                        uint16_t memory_table_num = 32) :
-            pool_memory_size(memory_size),
-            blocks_nums_in_table(memory_table_num),
-            block_max_size(max_block_size)
+                        uint16_t memory_table_num = 32) : blocks_nums_in_table(memory_table_num),
+                                                          pool_memory_size(memory_size),
+                                                          block_max_size(max_block_size)
     {
         blocks_table = new MemoryBlock[blocks_nums_in_table];
         pool_memory_ptr = new uint8_t[pool_memory_size];
@@ -67,8 +66,8 @@ public:
      */
     ~MemoryPool()
     {
-        delete[]pool_memory_ptr;
-        delete[]blocks_table;
+        delete[] pool_memory_ptr;
+        delete[] blocks_table;
     }
 
     /**
@@ -99,4 +98,4 @@ private:
     uint8_t *pool_memory_ptr;
 };
 
-#endif //TRANSBOT_SDK_MEMORY_POOL_HPP
+#endif // TRANSBOT_SDK_MEMORY_POOL_HPP
