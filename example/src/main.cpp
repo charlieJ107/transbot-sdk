@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     }
 
     // Get firmware version
-    LOG(INFO) << "firmware version: " << sdk.get_firmware_version();
+    // LOG(INFO) << "firmware version: " << sdk.get_firmware_version();
     // Get motion info
     auto motion_info = sdk.get_motion_info();
     LOG(INFO) << "motion info: " <<

@@ -85,6 +85,7 @@ namespace transbot_sdk
         }
         memcpy(this->data + 4, data_to_set + 4, length - 5);
         calculate_checksum();
+        data_set = true;
         return true;
     }
 

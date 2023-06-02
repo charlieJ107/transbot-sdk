@@ -1,5 +1,5 @@
 #include <glog/logging.h>
-
+#include <termios.h>
 #include <fcntl.h>
 #include "serial_device.hpp"
 
@@ -15,6 +15,46 @@ namespace transbot_sdk
             LOG(FATAL) << "Open serial device " << this->port_name << " failed.";
             return false;
         }
+
+        if (tcgetattr(serial_file_descriptor, &serial_port_settings) != 0)
+        {
+            LOG(FATAL) << "Get serial port settings failed.";
+            return false;
+        }
+
+        // Set baud rate to 115200
+        cfsetispeed(&serial_port_settings, B115200);
+        cfsetospeed(&serial_port_settings, B115200);
+
+        // Set data bits to 8
+        serial_port_settings.c_cflag &= ~CSIZE;
+        serial_port_settings.c_cflag |= CS8;
+        // Allow receve and use local
+        serial_port_settings.c_cflag |= (CLOCAL | CREAD);
+        // Set parity (奇偶校验) to none
+        serial_port_settings.c_cflag &= ~PARENB;
+        // Set stop bits to 1
+        serial_port_settings.c_cflag &= ~CSTOPB;
+
+        // Set wait time to 40ms
+        serial_port_settings.c_cc[VTIME] = 4;
+        // Set minimum receive bytes to 4
+        serial_port_settings.c_cc[VMIN] = 4;
+
+        // Using raw mode
+        serial_port_settings.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+        serial_port_settings.c_oflag &= ~OPOST;
+
+        // Flush the input and output buffer
+        tcflush(serial_file_descriptor, TCIFLUSH);
+
+        // Set the new options for the port
+        if (tcsetattr(serial_file_descriptor, TCSANOW, &serial_port_settings) != 0)
+        {
+            LOG(FATAL) << "Set serial port settings failed.";
+            return false;
+        }
+        
         return true;
     }
 
@@ -69,6 +109,11 @@ namespace transbot_sdk
             }
             LOG(INFO) << "Reconnect successfully.";
             read_bytes = read(serial_file_descriptor, buffer, max_length);
+        }
+
+        for (int i = 0; i < read_bytes; i++)
+        {
+            LOG(INFO) << "Receive: " << std::hex << buffer[i];
         }
         return read_bytes;
     }

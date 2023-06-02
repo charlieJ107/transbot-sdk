@@ -391,7 +391,7 @@ namespace transbot_sdk
     typedef struct _movement_status_response
     {
         uint16_t header = 0xFFFD;
-        uint8_t length = 0XFD;
+        uint8_t length = 0x13;
         uint8_t data_type = 0x08;
         // -45-45
         uint8_t linear_velocity;

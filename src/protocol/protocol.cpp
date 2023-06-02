@@ -73,7 +73,7 @@ std::shared_ptr<transbot_sdk::Package> Protocol::take(transbot_sdk::RECEIVE_FUNC
         return nullptr;
     }
     // Check receive buffer is empty
-    if (m_receive_buffer.find(receive_function) != m_receive_buffer.end() ||
+    if (m_receive_buffer.find(receive_function) == m_receive_buffer.end() ||
         m_receive_buffer.at(receive_function).is_empty())
     {
         LOG(ERROR) << "Receive buffer is empty.";
@@ -85,7 +85,7 @@ std::shared_ptr<transbot_sdk::Package> Protocol::take(transbot_sdk::RECEIVE_FUNC
     {
         package = m_receive_buffer.at(receive_function).pop();
     }
-    catch (std::length_error &e)
+    catch (std::out_of_range &e)
     {
         LOG(ERROR) << "Receive buffer is empty.";
         return nullptr;

@@ -381,14 +381,16 @@ namespace transbot_sdk
         if (protocol.send(package))
         {
             LOG(INFO) << "Set all arm servo angle successfully."
-                      << "Joint1: " << joint1
-                      << "Joint2: " << joint2 << "Joint3: " << joint3;
+                      << "Joint1: " << joint1 << "\n"
+                      << "Joint2: " << joint2 << "\n" 
+                      << "Joint3: " << joint3 << "\n";
         }
         else
         {
             LOG(ERROR) << "Set all arm servo angle failed."
-                       << "Joint1: " << joint1
-                       << "Joint2: " << joint2 << "Joint3: " << joint3;
+                       << "Joint1: " << joint1 << "\n"
+                       << "Joint2: " << joint2 << "\n" 
+                       << "Joint3: " << joint3 << "\n";
         }
         delete data;
     }
@@ -477,18 +479,18 @@ namespace transbot_sdk
 
     Motion_Info Transbot::get_motion_info()
     {
-        auto package = std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SEND_REQUEST);
-        auto data = new Request_Movement_Status;
-        package->set_data(reinterpret_cast<uint8_t *>(data));
-        if (protocol.send(package))
-        {
-            LOG(INFO) << "Get motion info successfully.";
-        }
-        else
-        {
-            LOG(ERROR) << "Get motion info failed.";
-        }
-        delete data;
+        // auto package = std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SEND_REQUEST);
+        // auto data = new Request_Movement_Status;
+        // package->set_data(reinterpret_cast<uint8_t *>(data));
+        // if (protocol.send(package))
+        // {
+        //     LOG(INFO) << "Get motion info successfully.";
+        // }
+        // else
+        // {
+        //     LOG(ERROR) << "Get motion info failed.";
+        // }
+        // delete data;
         // Take response
         auto response = protocol.take(MOTION_STATUS);
         if (response == nullptr)
