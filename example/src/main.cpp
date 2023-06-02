@@ -39,17 +39,17 @@ int main(int argc, char *argv[])
     LOG(INFO) << "arm position: " << joint1 << ", " << joint2 << ", " << joint3;
 
     // Move straight
-    sdk.move_straight(15);
-    // Delay 1 second
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    // Stop
-    sdk.move_straight(0);
-    // Move back
-    sdk.move_straight(-15);
-    // Delay 1 second
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    // Stop
-    sdk.move_straight(0);
+    // sdk.move_straight(15);
+    // // Delay 1 second
+    // std::this_thread::sleep_for(std::chrono::seconds(1));
+    // // Stop
+    // sdk.move_straight(0);
+    // // Move back
+    // sdk.move_straight(-15);
+    // // Delay 1 second
+    // std::this_thread::sleep_for(std::chrono::seconds(1));
+    // // Stop
+    // sdk.move_straight(0);
 
     // Beep 1 second
     sdk.set_beep(1);
