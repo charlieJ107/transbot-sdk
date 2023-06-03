@@ -25,7 +25,7 @@ public:
 
     bool send(const std::shared_ptr<transbot_sdk::Package> &package);
 
-    transbot_sdk::Package take(transbot_sdk::RECEIVE_FUNCTION receive_function);
+    std::shared_ptr<transbot_sdk::Package> take(transbot_sdk::RECEIVE_FUNCTION receive_function);
 
 private:
     std::shared_ptr<transbot_sdk::HardwareInterface> m_hardware;

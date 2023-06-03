@@ -67,7 +67,7 @@ bool Protocol::send(const std::shared_ptr<transbot_sdk::Package> &package)
     return true;
 }
 
-transbot_sdk::Package Protocol::take(transbot_sdk::RECEIVE_FUNCTION receive_function)
+std::shared_ptr<transbot_sdk::Package> Protocol::take(transbot_sdk::RECEIVE_FUNCTION receive_function)
 {
     // Check receive function is valid
     if (transbot_sdk::VALID_RECEIVE_FUNCTION.find(receive_function) == transbot_sdk::VALID_RECEIVE_FUNCTION.end())
@@ -83,10 +83,10 @@ transbot_sdk::Package Protocol::take(transbot_sdk::RECEIVE_FUNCTION receive_func
         return nullptr;
     }
     // Get a package from the receive buffer
-    transbot_sdk::Package package;
+    std::shared_ptr<transbot_sdk::Package> package;
     try
     {
-        package = transbot_sdk::Package(m_receive_buffer.at(receive_function)->pop());
+        package = std::make_shared<transbot_sdk::Package>(m_receive_buffer.at(receive_function)->pop());
     }
     catch (std::out_of_range &e)
     {
