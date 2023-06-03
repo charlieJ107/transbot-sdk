@@ -25,7 +25,7 @@ public:
 
     bool send(const std::shared_ptr<transbot_sdk::Package> &package);
 
-    std::shared_ptr<transbot_sdk::Package> take(transbot_sdk::RECEIVE_FUNCTION receive_function);
+    transbot_sdk::Package take(transbot_sdk::RECEIVE_FUNCTION receive_function);
 
 private:
     std::shared_ptr<transbot_sdk::HardwareInterface> m_hardware;
@@ -35,7 +35,7 @@ private:
     uint8_t *m_receive_buffer_ptr;
     bool m_is_running;
     std::thread m_receive_thread;
-    std::unordered_map<transbot_sdk::RECEIVE_FUNCTION, CircularBuffer<std::shared_ptr<transbot_sdk::Package>>> m_receive_buffer;
+    std::unordered_map<transbot_sdk::RECEIVE_FUNCTION, std::shared_ptr<CircularBuffer<transbot_sdk::Package>>> m_receive_buffer;
 };
 
-#endif //TRANSBOT_SDK_PROTOCOL_HPP
+#endif // TRANSBOT_SDK_PROTOCOL_HPP

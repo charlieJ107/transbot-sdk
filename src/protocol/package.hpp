@@ -501,7 +501,7 @@ namespace transbot_sdk
         SEND = 0xFE
     };
 
-    static const std::unordered_map<uint8_t, uint8_t> SEND_PACKAGE_LEN{
+    static const std::unordered_map<SEND_FUNCTION, uint8_t> SEND_PACKAGE_LEN{
         {SEND_FUNCTION::SET_PID, 0x0A},
         {SEND_FUNCTION::SET_CHASSIS_MOTION, 0x06},
         {SEND_FUNCTION::SET_PWM_SERVO, 0x05},
@@ -521,7 +521,7 @@ namespace transbot_sdk
         {SEND_FUNCTION::SEND_REQUEST, 0x05},
         {SEND_FUNCTION::CLEAR_FLASH, 0x04}};
     // A set for valid send function
-    static const std::unordered_set<uint8_t> VALID_SEND_FUNCTION{
+    static const std::unordered_set<SEND_FUNCTION> VALID_SEND_FUNCTION{
         SEND_FUNCTION::SET_PID,
         SEND_FUNCTION::SET_CHASSIS_MOTION,
         SEND_FUNCTION::SET_PWM_SERVO,
@@ -541,30 +541,33 @@ namespace transbot_sdk
         SEND_FUNCTION::SEND_REQUEST,
         SEND_FUNCTION::CLEAR_FLASH};
     // A set for valid receive function
-    static const std::unordered_set<uint8_t> VALID_RECEIVE_FUNCTION{
+    static const std::unordered_set<RECEIVE_FUNCTION> VALID_RECEIVE_FUNCTION{
         RECEIVE_FUNCTION::FIRMWARE_VERSION,
         RECEIVE_FUNCTION::YAW_ANGLE,
         RECEIVE_FUNCTION::ARM_SERVO_POSITION,
         RECEIVE_FUNCTION::MOTION_STATUS,
         RECEIVE_FUNCTION::PID_PARAM,
         RECEIVE_FUNCTION::GYRO_ASSIST_ENABLED};
-    static const std::unordered_map<uint8_t, uint8_t> RECEIVE_PACKAGE_LEN{
+    static const std::unordered_map<RECEIVE_FUNCTION, uint8_t> RECEIVE_PACKAGE_LEN{
         {RECEIVE_FUNCTION::FIRMWARE_VERSION, 0x05},
         {RECEIVE_FUNCTION::YAW_ANGLE, 0x05},
         {RECEIVE_FUNCTION::ARM_SERVO_POSITION, 0x06},
         {RECEIVE_FUNCTION::MOTION_STATUS, 0x13},
         {RECEIVE_FUNCTION::PID_PARAM, 0x09},
         {RECEIVE_FUNCTION::GYRO_ASSIST_ENABLED, 0x04}};
-    typedef uint8_t FUNCTION_TYPE;
+    typedef union _function_type
+    {
+        SEND_FUNCTION send_function;
+        RECEIVE_FUNCTION receive_function;
+        uint8_t function;
+    } FUNCTION_TYPE;
 
     class Package
     {
     public:
         Package();
-
-        Package(Direction direction, FUNCTION_TYPE function);
-
-        Package(Package const &aPackage);
+        Package(SEND_FUNCTION function);
+        Package(RECEIVE_FUNCTION function);
 
         ~Package();
 

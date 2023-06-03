@@ -4,6 +4,7 @@
 
 namespace transbot_sdk
 {
+
     bool Transbot::init()
     {
         return this->protocol.init();
@@ -22,7 +23,7 @@ namespace transbot_sdk
             return;
         }
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_CHASSIS_MOTION);
+            std::make_shared<Package>(SEND_FUNCTION::SET_CHASSIS_MOTION);
         auto data = new Move_Control(static_cast<uint8_t>(linear_velocity),
                                      static_cast<uint16_t>(angular_velocity));
 
@@ -51,7 +52,7 @@ namespace transbot_sdk
             return;
         }
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_PWM_SERVO);
+            std::make_shared<Package>(SEND_FUNCTION::SET_PWM_SERVO);
         auto data = new PWM_Servo_Control(static_cast<uint8_t>(channel),
                                           static_cast<uint8_t>(angle));
 
@@ -95,7 +96,7 @@ namespace transbot_sdk
         }
 
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_LED_STRIP);
+            std::make_shared<Package>(SEND_FUNCTION::SET_LED_STRIP);
 
         auto data = new RGB_Control(static_cast<uint8_t>(id),
                                     static_cast<uint8_t>(r),
@@ -133,7 +134,7 @@ namespace transbot_sdk
         }
 
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_STRIP_EFFECT);
+            std::make_shared<Package>(SEND_FUNCTION::SET_STRIP_EFFECT);
         auto data = new RGB_Effect(static_cast<uint8_t>(effect),
                                    static_cast<uint8_t>(velocity),
                                    static_cast<uint8_t>(param));
@@ -162,7 +163,7 @@ namespace transbot_sdk
         }
 
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_BEEP);
+            std::make_shared<Package>(SEND_FUNCTION::SET_BEEP);
         auto data = new Buzzer(static_cast<uint8_t>(10 * duration));
         package->set_data(reinterpret_cast<uint8_t *>(data));
         if (this->protocol.send(package))
@@ -186,7 +187,7 @@ namespace transbot_sdk
             return;
         }
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_LIGHT);
+            std::make_shared<Package>(SEND_FUNCTION::SET_LIGHT);
 
         auto data = new LED_Light(static_cast<uint8_t>(lightness));
 
@@ -207,7 +208,7 @@ namespace transbot_sdk
     void Transbot::enable_gyro_assist(bool enable)
     {
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_GYRO_ENABLE);
+            std::make_shared<Package>(SEND_FUNCTION::SET_GYRO_ENABLE);
         auto data = new Gyro_Direction(static_cast<uint8_t>(enable ? transbot_sdk::TRANSBOT_ENABLE::ENABLE
                                                                    : transbot_sdk::TRANSBOT_ENABLE::DISABLE));
 
@@ -233,7 +234,7 @@ namespace transbot_sdk
             return;
         }
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_MOTOR_FORWARD);
+            std::make_shared<Package>(SEND_FUNCTION::SET_MOTOR_FORWARD);
 
         auto data = new Forward(static_cast<int8_t>(speed));
         package->set_data(reinterpret_cast<uint8_t *>(data));
@@ -253,7 +254,7 @@ namespace transbot_sdk
     void Transbot::enable_servo_torque(bool enable)
     {
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_ARM_SERVO_TORQUE);
+            std::make_shared<Package>(SEND_FUNCTION::SET_ARM_SERVO_TORQUE);
         auto data = new Enable_Servo_Torque(static_cast<uint8_t>(enable ? transbot_sdk::TRANSBOT_ENABLE::ENABLE
                                                                         : transbot_sdk::TRANSBOT_ENABLE::DISABLE));
         package->set_data(reinterpret_cast<uint8_t *>(data));
@@ -307,7 +308,7 @@ namespace transbot_sdk
         }
 
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_ARM_SERVO);
+            std::make_shared<Package>(SEND_FUNCTION::SET_ARM_SERVO);
 
         auto data = new Servo_Control(static_cast<uint8_t>(servoId),
                                       static_cast<uint16_t>(angle_to_pwm(angle, servoId)),
@@ -370,7 +371,7 @@ namespace transbot_sdk
         }
 
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_ARM_MOTION);
+            std::make_shared<Package>(SEND_FUNCTION::SET_ARM_MOTION);
         auto data = new Control_Arm_Joint_Position(static_cast<uint16_t>(angle_to_pwm(joint1, TRANSBOT_ARM_SERVO_ID::JOINT1)),
                                                    static_cast<uint16_t>(angle_to_pwm(joint2, TRANSBOT_ARM_SERVO_ID::JOINT2)),
                                                    static_cast<uint16_t>(angle_to_pwm(joint3, TRANSBOT_ARM_SERVO_ID::JOINT3)),
@@ -382,14 +383,14 @@ namespace transbot_sdk
         {
             LOG(INFO) << "Set all arm servo angle successfully."
                       << "Joint1: " << joint1 << "\n"
-                      << "Joint2: " << joint2 << "\n" 
+                      << "Joint2: " << joint2 << "\n"
                       << "Joint3: " << joint3 << "\n";
         }
         else
         {
             LOG(ERROR) << "Set all arm servo angle failed."
                        << "Joint1: " << joint1 << "\n"
-                       << "Joint2: " << joint2 << "\n" 
+                       << "Joint2: " << joint2 << "\n"
                        << "Joint3: " << joint3 << "\n";
         }
         delete data;
@@ -397,7 +398,7 @@ namespace transbot_sdk
 
     std::string Transbot::get_firmware_version()
     {
-        auto package = std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SEND_REQUEST);
+        auto package = std::make_shared<Package>(SEND_FUNCTION::SEND_REQUEST);
         auto data = new Request_Firmware_Version;
         package->set_data(reinterpret_cast<uint8_t *>(data));
         if (protocol.send(package))
@@ -425,7 +426,7 @@ namespace transbot_sdk
 
     int Transbot::get_yaw_angle()
     {
-        auto package = std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SEND_REQUEST);
+        auto package = std::make_shared<Package>(SEND_FUNCTION::SEND_REQUEST);
         auto data = new Request_Yaw;
         package->set_data(reinterpret_cast<uint8_t *>(data));
         if (protocol.send(package))
@@ -451,7 +452,7 @@ namespace transbot_sdk
 
     int Transbot::get_servo_position(int channel)
     {
-        auto package = std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SEND_REQUEST);
+        auto package = std::make_shared<Package>(SEND_FUNCTION::SEND_REQUEST);
         auto data = new Request_Servo_Position(static_cast<uint8_t>(channel));
         package->set_data(reinterpret_cast<uint8_t *>(data));
         if (protocol.send(package))
@@ -479,7 +480,7 @@ namespace transbot_sdk
 
     Motion_Info Transbot::get_motion_info()
     {
-        // auto package = std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SEND_REQUEST);
+        // auto package = std::make_shared<Package>(SEND_FUNCTION::SEND_REQUEST);
         // auto data = new Request_Movement_Status;
         // package->set_data(reinterpret_cast<uint8_t *>(data));
         // if (protocol.send(package))
@@ -526,7 +527,7 @@ namespace transbot_sdk
 
     PID_Parameters Transbot::get_pid_parameters()
     {
-        auto package = std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SEND_REQUEST);
+        auto package = std::make_shared<Package>(SEND_FUNCTION::SEND_REQUEST);
         auto data = new Request_PID_Parameters;
         package->set_data(reinterpret_cast<uint8_t *>(data));
         if (protocol.send(package))
@@ -559,7 +560,7 @@ namespace transbot_sdk
 
     bool Transbot::is_gyro_assist_enabled()
     {
-        auto package = std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SEND_REQUEST);
+        auto package = std::make_shared<Package>(SEND_FUNCTION::SEND_REQUEST);
         auto data = new Request_Gyro_Assist;
         package->set_data(reinterpret_cast<uint8_t *>(data));
         if (protocol.send(package))

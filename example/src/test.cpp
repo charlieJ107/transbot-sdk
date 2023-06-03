@@ -7,6 +7,14 @@
 
 int main(int argc, char *argv[])
 {
+    uint16_t *a = new uint16_t;
+    *a = 0xfffd;
+    uint8_t *b = (uint8_t *)a;
+    std::cout << "0x" << std::hex << (int)b[0] << " 0x" << std::hex << (int)b[1] << std::endl;
+    b[0] = 0xff;
+    b[1] = 0xfd;
+    std::cout << "0x" << std::hex << (int)*a << std::endl;
+    delete a;
 
     int serial_file_descriptor = open("/dev/ttyTHS1", O_RDWR | O_NOCTTY);
     std::cout << serial_file_descriptor << std::endl;
@@ -24,8 +32,8 @@ int main(int argc, char *argv[])
     // Set stop bits to 1
     serial_port_settings.c_cflag &= ~CSTOPB;
 
-    // Set wait time to 40ms
-    serial_port_settings.c_cc[VTIME] = 4;
+    // Set wait time to 30ms
+    serial_port_settings.c_cc[VTIME] = 3;
     // Set minimum receive bytes to 4
     serial_port_settings.c_cc[VMIN] = 4;
 
@@ -45,8 +53,8 @@ int main(int argc, char *argv[])
     }
     std::cout << "Set serial port settings success." << std::endl;
 
-    uint8_t buffer[1024];
-    int read_bytes = read(serial_file_descriptor, buffer, 1024);
+    uint8_t buffer[1];
+    int read_bytes = read(serial_file_descriptor, buffer, 1);
     std::cout << "Read " << read_bytes << " bytes." << std::endl;
     for (int i = 0; i < read_bytes; i++)
     {

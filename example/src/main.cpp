@@ -3,7 +3,11 @@
 
 int main(int argc, char *argv[])
 {
+    FLAGS_logtostderr = true;
+    FLAGS_colorlogtostderr = true;
+    FLAGS_stderrthreshold = 0;
     google::InitGoogleLogging(argv[0]);
+    // google::EnableLogCleaner(0);
     transbot_sdk::Transbot sdk;
     if (sdk.init())
     {
@@ -14,6 +18,8 @@ int main(int argc, char *argv[])
         LOG(ERROR) << "init failed";
         return -1;
     }
+    // Wait for packages to be received 5 second
+    std::this_thread::sleep_for(std::chrono::seconds(10));
 
     // Get firmware version
     // LOG(INFO) << "firmware version: " << sdk.get_firmware_version();
@@ -55,7 +61,7 @@ int main(int argc, char *argv[])
     sdk.set_beep(1);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     sdk.set_beep(0);
-
+    
 
     return 0;
 }
