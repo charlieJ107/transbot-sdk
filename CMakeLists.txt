@@ -2,8 +2,13 @@ cmake_minimum_required(VERSION 3.10)
 project(transbot_sdk)
 
 set(CMAKE_CXX_STANDARD 14)
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(glog REQUIRED libglog)
+if (DEFINED CMAKE_TOOLCHAIN_FILE)
+    find_package(glog REQUIRED)
+else ()
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(glog REQUIRED libglog)
+endif ()
+
 
 add_library(transbot_sdk
         SHARED

@@ -10,9 +10,9 @@ Protocol::Protocol()
     m_is_running = false;
     m_receive_buffer_ptr = new uint8_t[transbot_sdk::MAX_PACKAGE_LEN];
     m_receive_buffer =
-        std::unordered_map<
-            transbot_sdk::RECEIVE_FUNCTION,
-            std::shared_ptr<CircularBuffer<transbot_sdk::Package>>>();
+            std::unordered_map<
+                    transbot_sdk::RECEIVE_FUNCTION,
+                    std::shared_ptr<CircularBuffer<transbot_sdk::Package>>>();
 }
 
 bool Protocol::init()
@@ -39,7 +39,8 @@ bool Protocol::send(const std::shared_ptr<transbot_sdk::Package> &package)
         return false;
     }
     // Check package is a valid function
-    if (transbot_sdk::VALID_SEND_FUNCTION.find(package->get_function().send_function) == transbot_sdk::VALID_SEND_FUNCTION.end())
+    if (transbot_sdk::VALID_SEND_FUNCTION.find(package->get_function().send_function) ==
+        transbot_sdk::VALID_SEND_FUNCTION.end())
     {
         LOG(ERROR) << "Package is not a valid send package. It has a wrong function.";
         return false;
@@ -128,7 +129,7 @@ void Protocol::receive_thread()
             {
                 continue;
             }
-            if (*single_buffer == (uint8_t)0xFF)
+            if (*single_buffer == (uint8_t) 0xFF)
             {
                 // Find the header
                 std::cout << "Receive header." << std::endl;
@@ -139,7 +140,7 @@ void Protocol::receive_thread()
                     continue;
                 }
 
-                if (*single_buffer == (uint8_t)0xFD)
+                if (*single_buffer == (uint8_t) 0xFD)
                 {
                     // Find the second header
                     std::cout << "Receive second header." << std::endl;
@@ -148,11 +149,11 @@ void Protocol::receive_thread()
                 }
                 else
                 {
-                    std::cout << "0x" << std::hex << (int)*single_buffer << " " << std::endl;
+                    std::cout << "0x" << std::hex << (int) *single_buffer << " " << std::endl;
                     continue;
                 }
             }
-            std::cout << "0x" << std::hex << (int)*single_buffer << " is not a valid header" << std::endl;
+            std::cout << "0x" << std::hex << (int) *single_buffer << " is not a valid header" << std::endl;
         }
         delete single_buffer;
         receive = m_hardware->receive(m_receive_buffer_ptr + 2, transbot_sdk::MAX_PACKAGE_LEN - 2);
@@ -162,7 +163,7 @@ void Protocol::receive_thread()
             LOG(INFO) << "Receive another " << receive << " bytes from hardware.";
             for (int i = 0; i < receive + 2; i++)
             {
-                std::cout << "0x" << std::hex << (int)m_receive_buffer_ptr[i] << " ";
+                std::cout << "0x" << std::hex << (int) m_receive_buffer_ptr[i] << " ";
             }
             std::cout << std::endl;
 
@@ -175,7 +176,7 @@ void Protocol::receive_thread()
                 LOG(ERROR) << "Receive function is not valid.";
                 continue;
             }
-            else 
+            else
             {
                 receive_function = *it;
             }
@@ -183,12 +184,14 @@ void Protocol::receive_thread()
             transbot_sdk::Package package = transbot_sdk::Package(receive_function);
             package.set_data(m_receive_buffer_ptr);
             // Check receive buffer exists, if not, create one
-            if (m_receive_buffer.find(receive_function) == m_receive_buffer.end())
+            auto buffer = m_receive_buffer.find(receive_function);
+            if (buffer == m_receive_buffer.end())
             {
-                m_receive_buffer.insert(std::make_pair(receive_function, std::make_shared<CircularBuffer<transbot_sdk::Package>>(10)));
+                buffer = m_receive_buffer.emplace(
+                        receive_function, std::make_shared<CircularBuffer<transbot_sdk::Package>>(10)).first;
             }
-            // Push the package to the receive buffer
-            m_receive_buffer.at(receive_function)->push(package);
+            // Push the package to the received buffer
+            buffer->second->push(package);
         }
         else
         {

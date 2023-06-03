@@ -566,8 +566,10 @@ namespace transbot_sdk
     {
     public:
         Package();
-        Package(SEND_FUNCTION function);
-        Package(RECEIVE_FUNCTION function);
+
+        explicit Package(SEND_FUNCTION function);
+
+        explicit Package(RECEIVE_FUNCTION function);
 
         ~Package();
 
@@ -598,7 +600,6 @@ namespace transbot_sdk
         uint8_t checksum;
         uint8_t length;
         bool data_set;
-        std::mutex data_mutex;
     };
 
     const int MAX_PACKAGE_LEN = 0x13;

@@ -3,12 +3,14 @@
 
 #include <memory>
 #include <mutex>
+
 /**
  * @brief CircularBuffer for certain command
  * @tparam T Certain Data type in_use in the buffer
  */
-template <class T>
-class CircularBuffer {
+template<class T>
+class CircularBuffer
+{
 public:
     /**
      * @brief Constructor of circular buffer
@@ -16,8 +18,12 @@ public:
      */
     explicit CircularBuffer(size_t size) :
             buffer(std::unique_ptr<T[]>(new T[size])),
-            max_size(size)
+            head(0),
+            tail(0),
+            max_size(size),
+            full(false)
     {}
+
     /**
      * @brief push the data into the buffer
      * @param item Item to be pushed into the buffer
@@ -28,7 +34,7 @@ public:
 
         buffer[head] = item;
 
-        if(full)
+        if (full)
         {
             tail = (tail + 1) % max_size;
         }
@@ -59,6 +65,7 @@ public:
 
         return item;
     }
+
     /**
      * @brief reset the buffer
      */
@@ -68,6 +75,7 @@ public:
         head = tail;
         full = false;
     }
+
     /**
      * @brief Decide whether the buffer is empty
      * @return True if empty
@@ -77,6 +85,7 @@ public:
         //if head and tail are equal, we are empty
         return (!full && (head == tail));
     }
+
     /**
      * @brief Decide whether the buffer is full
      * @return True if full
@@ -86,6 +95,7 @@ public:
         //If tail is ahead the head by 1, we are full
         return full;
     }
+
     /**
      * @brief Get the buffer capacity(max size of the buffer)
      * @return The buffer capacity
@@ -94,6 +104,7 @@ public:
     {
         return max_size;
     }
+
     /**
      * @brief Get the current size of the buffer
      * @return The current size of the buffer
@@ -102,9 +113,9 @@ public:
     {
         size_t size = max_size;
 
-        if(!full)
+        if (!full)
         {
-            if(head >= tail)
+            if (head >= tail)
             {
                 size = head - tail;
             }
@@ -123,13 +134,13 @@ private:
     //! buffer pointer
     std::unique_ptr<T[]> buffer;
     //! buffer head
-    size_t head = 0;
+    size_t head;
     //! buffer tail
-    size_t tail = 0;
+    size_t tail;
     //! buffer capacity
     size_t max_size;
     //! flag of full buffer
-    bool full = 0;
+    bool full;
 };
 
 #endif //TRANSBOT_SDK_CIRCULAR_BUFFER_HPP

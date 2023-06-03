@@ -126,7 +126,6 @@ namespace transbot_sdk
 
     uint8_t *Package::get_data_ptr()
     {
-        std::lock_guard<std::mutex> lock(data_mutex);
         if (data_set)
         {
             return data;
@@ -167,14 +166,4 @@ namespace transbot_sdk
         return m_function;
     }
 
-    Package::Package(Package const &aPackage)
-    {
-        m_direction = aPackage.m_direction;
-        m_function = aPackage.m_function;
-        data_set = aPackage.data_set;
-        checksum = aPackage.checksum;
-        length = aPackage.length;
-        data = new uint8_t[length];
-        memcpy(data, aPackage.data, length);
-    }
 }
