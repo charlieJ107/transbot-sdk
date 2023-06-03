@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
               "battery voltage: " << motion_info.battery_voltage << ", \n";
 
     // Set arm position
-    sdk.set_all_arm_servo_angle(90, 90, 90, 1000);
+    // sdk.set_all_arm_servo_angle(90, 90, 90, 1000);
     // Get arm position:
     auto joint1 = sdk.get_servo_position(transbot_sdk::TRANSBOT_ARM_SERVO_ID::JOINT1);
     auto joint2 = sdk.get_servo_position(transbot_sdk::TRANSBOT_ARM_SERVO_ID::JOINT2);

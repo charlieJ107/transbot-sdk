@@ -9,10 +9,9 @@ Protocol::Protocol()
     m_is_running = false;
     m_receive_buffer_ptr = new uint8_t[transbot_sdk::MAX_PACKAGE_LEN];
     m_receive_buffer =
-            std::unordered_map<
-                    transbot_sdk::RECEIVE_FUNCTION,
-                    CircularBuffer<std::shared_ptr<transbot_sdk::Package>>
-            >();
+        std::unordered_map<
+            transbot_sdk::RECEIVE_FUNCTION,
+            CircularBuffer<std::shared_ptr<transbot_sdk::Package>>>();
 }
 
 bool Protocol::init()
@@ -24,7 +23,10 @@ bool Protocol::init()
         return false;
     }
     // Start a thread to receive data from hardware
+    LOG(INFO) << "Start receive thread.";
     m_receive_thread = std::thread(&Protocol::receive_thread, this);
+    LOG(INFO) << "Receive thread started.";
+    // m_receive_thread.join();
     return true;
 }
 
@@ -56,7 +58,7 @@ bool Protocol::send(const std::shared_ptr<transbot_sdk::Package> &package)
     }
     size_t sent_bytes = m_hardware->send(package->get_data_ptr(), package->get_length());
 
-    if (sent_bytes<=0 || sent_bytes != package->get_length())
+    if (sent_bytes <= 0 || sent_bytes != package->get_length())
     {
         LOG(ERROR) << "Package is not sent completely.";
         return false;
@@ -120,7 +122,12 @@ std::shared_ptr<transbot_sdk::Package> Protocol::take(transbot_sdk::RECEIVE_FUNC
 Protocol::~Protocol()
 {
     m_is_running = false;
-    m_receive_thread.join();
+    if (m_receive_thread.joinable())
+    {
+        LOG(INFO) << "Join receive thread.";
+        m_receive_thread.join();
+    }
+
     delete[] m_receive_buffer_ptr;
 }
 
@@ -129,8 +136,9 @@ void Protocol::receive_thread()
     while (m_is_running)
     {
         auto receive = m_hardware->receive(m_receive_buffer_ptr, transbot_sdk::MAX_PACKAGE_LEN);
-        if (receive)
+        if (receive>=0)
         {
+            LOG(INFO) << "Receive " << receive << " bytes from hardware.";
             auto function_type = transbot_sdk::VALID_RECEIVE_FUNCTION.find(m_receive_buffer_ptr[3]);
             if (function_type ==
                 transbot_sdk::VALID_RECEIVE_FUNCTION.end())
@@ -138,29 +146,25 @@ void Protocol::receive_thread()
                 LOG(ERROR) << "Invalid function type received from hardware, returned bytes: " << receive << ".";
                 continue;
             }
-
+            LOG(INFO) << "Receive function type: " << static_cast<int>(m_receive_buffer_ptr[3]) << ".";
             // Parse package
             auto package =
-                    std::make_shared<transbot_sdk::Package>(transbot_sdk::RECEIVE, *function_type);
+                std::make_shared<transbot_sdk::Package>(transbot_sdk::RECEIVE, *function_type);
             package->set_data(m_receive_buffer_ptr);
             // Push package to receive buffer
             try
             {
-
+                LOG(INFO) << "Push package to receive buffer.";
                 m_receive_buffer.at(static_cast<const transbot_sdk::RECEIVE_FUNCTION>(*function_type)).push(package);
             }
             catch (std::length_error &e)
             {
                 LOG(ERROR) << "Receive buffer is full.";
             }
-
         }
         else
         {
             LOG(WARNING) << "Invalid data received from hardware, returned bytes: " << receive << ".";
         }
     }
-
 }
-
-

@@ -1,6 +1,7 @@
 #include <glog/logging.h>
 #include <mutex>
 #include "package.hpp"
+#include <cstring>
 
 namespace transbot_sdk
 {
