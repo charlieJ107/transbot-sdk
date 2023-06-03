@@ -41,6 +41,7 @@ namespace transbot_sdk
                        << "Linear velocity: " << static_cast<int>(linear_velocity)
                        << "Angular velocity: " << static_cast<int>(angular_velocity);
         }
+        LOG(INFO) << "Set chassis motion successfully. Delete data.";
         delete data;
     }
 
@@ -69,6 +70,7 @@ namespace transbot_sdk
                        << "Channel: " << static_cast<int>(channel)
                        << "Angle: " << angle;
         }
+        LOG(INFO) << "Set camara angle successfully. Delete data.";
         delete data;
     }
 
@@ -117,6 +119,7 @@ namespace transbot_sdk
                        << "Id: " << id
                        << "R: " << r << "G: " << g << "B: " << b;
         }
+        LOG(INFO) << "Set led strip successfully. Delete data.";
         delete data;
     }
 
@@ -151,6 +154,7 @@ namespace transbot_sdk
                        << "Effect: " << effect
                        << "Velocity: " << velocity << "Param: " << param;
         }
+        LOG(INFO) << "Set led strip effect successfully. Delete data.";
         delete data;
     }
 
@@ -176,6 +180,7 @@ namespace transbot_sdk
             LOG(ERROR) << "Set beep failed."
                        << "Duration: " << duration;
         }
+        LOG(INFO) << "Set beep successfully. Delete data.";
         delete data;
     }
 
@@ -202,6 +207,7 @@ namespace transbot_sdk
             LOG(ERROR) << "Set light failed."
                        << "Lightness: " << lightness;
         }
+        LOG(INFO) << "Set light successfully. Delete data.";
         delete data;
     }
 
@@ -223,6 +229,7 @@ namespace transbot_sdk
             LOG(ERROR) << "Set gyro assist failed."
                        << "Enable: " << enable;
         }
+        LOG(INFO) << "Set gyro assist successfully. Delete data.";
         delete data;
     }
 
@@ -248,6 +255,7 @@ namespace transbot_sdk
             LOG(ERROR) << "Move straight failed."
                        << "Speed: " << speed;
         }
+        LOG(INFO) << "Move straight successfully. Delete data.";
         delete data;
     }
 
@@ -268,6 +276,7 @@ namespace transbot_sdk
             LOG(ERROR) << "Set servo torque failed."
                        << "Enable: " << enable;
         }
+        LOG(INFO) << "Set servo torque successfully. Delete data.";
         delete data;
     }
 
@@ -393,6 +402,7 @@ namespace transbot_sdk
                        << "Joint2: " << joint2 << "\n"
                        << "Joint3: " << joint3 << "\n";
         }
+        LOG(INFO) << "Set all arm servo angle successfully. Delete data.";
         delete data;
     }
 
@@ -409,6 +419,7 @@ namespace transbot_sdk
         {
             LOG(ERROR) << "Get firmware version failed.";
         }
+        LOG(INFO) << "Get firmware version successfully. Delete data.";
         delete data;
         // Take response
         auto response = protocol.take(FIRMWARE_VERSION);
@@ -437,6 +448,7 @@ namespace transbot_sdk
         {
             LOG(ERROR) << "Get yaw angle failed.";
         }
+        LOG(INFO) << "Get yaw angle successfully. Delete data.";
         delete data;
         // Take response
         auto response = protocol.take(YAW_ANGLE);
@@ -463,6 +475,7 @@ namespace transbot_sdk
         {
             LOG(ERROR) << "Get servo position failed.";
         }
+        LOG(INFO) << "Get servo position successfully. Delete data.";
         delete data;
         // Take response
         auto response = protocol.take(ARM_SERVO_POSITION);
@@ -480,19 +493,6 @@ namespace transbot_sdk
 
     Motion_Info Transbot::get_motion_info()
     {
-        // auto package = std::make_shared<Package>(SEND_FUNCTION::SEND_REQUEST);
-        // auto data = new Request_Movement_Status;
-        // package->set_data(reinterpret_cast<uint8_t *>(data));
-        // if (protocol.send(package))
-        // {
-        //     LOG(INFO) << "Get motion info successfully.";
-        // }
-        // else
-        // {
-        //     LOG(ERROR) << "Get motion info failed.";
-        // }
-        // delete data;
-        // Take response
         auto response = protocol.take(MOTION_STATUS);
         if (response == nullptr)
         {
@@ -538,6 +538,7 @@ namespace transbot_sdk
         {
             LOG(ERROR) << "Get PID parameters failed.";
         }
+        LOG(INFO) << "Get PID parameters successfully. Delete data.";
         delete data;
         // Take response
         auto response = protocol.take(PID_PARAM);
@@ -571,6 +572,7 @@ namespace transbot_sdk
         {
             LOG(ERROR) << "Get gyro assist status failed.";
         }
+        LOG(INFO) << "Get gyro assist status successfully. Delete data.";
         delete data;
         // Take response
         auto response = protocol.take(GYRO_ASSIST_ENABLED);

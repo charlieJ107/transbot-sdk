@@ -19,10 +19,11 @@ int main(int argc, char *argv[])
         return -1;
     }
     // Wait for packages to be received 5 second
-    std::this_thread::sleep_for(std::chrono::seconds(10));
+    LOG(INFO) << "Wait for packages to be received 5 second";
+    std::this_thread::sleep_for(std::chrono::seconds(5));
 
     // Get firmware version
-    // LOG(INFO) << "firmware version: " << sdk.get_firmware_version();
+    LOG(INFO) << "firmware version: " << sdk.get_firmware_version();
     // Get motion info
     auto motion_info = sdk.get_motion_info();
     LOG(INFO) << "motion info: " <<

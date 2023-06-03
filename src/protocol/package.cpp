@@ -78,7 +78,6 @@ namespace transbot_sdk
 
     bool Package::set_data(uint8_t *data_to_set)
     {
-        std::lock_guard<std::mutex> lock(data_mutex);
         if (data_set)
         {
             LOG(ERROR) << "Data has already been set.";
@@ -113,7 +112,7 @@ namespace transbot_sdk
             std::cout << "0x" << std::hex << (int)data_to_set[i] << " ";
         }
         std::cout << std::endl;
-        memcpy(this->data + 4, data_to_set + 4, length - 5);
+        memcpy(this->data + 4, data_to_set + 4, length - 4);
         calculate_checksum();
         data_set = true;
         return true;

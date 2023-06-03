@@ -110,17 +110,18 @@ Protocol::~Protocol()
         LOG(INFO) << "Join receive thread.";
         m_receive_thread.join();
     }
-
+    LOG(INFO) << "Delete receive buffer.";
     delete[] m_receive_buffer_ptr;
 }
 
 void Protocol::receive_thread()
 {
     LOG(INFO) << "Receive thread started.";
+    uint8_t *single_buffer = new uint8_t;
     while (m_is_running)
     {
         memset(m_receive_buffer_ptr, 0, transbot_sdk::MAX_PACKAGE_LEN);
-        uint8_t *single_buffer = new uint8_t;
+        
         int receive = 0;
         while (true)
         {
@@ -155,7 +156,7 @@ void Protocol::receive_thread()
             }
             std::cout << "0x" << std::hex << (int) *single_buffer << " is not a valid header" << std::endl;
         }
-        delete single_buffer;
+        
         receive = m_hardware->receive(m_receive_buffer_ptr + 2, transbot_sdk::MAX_PACKAGE_LEN - 2);
         if (receive >= 0)
         {
@@ -187,10 +188,12 @@ void Protocol::receive_thread()
             auto buffer = m_receive_buffer.find(receive_function);
             if (buffer == m_receive_buffer.end())
             {
+                LOG(INFO) << "Create a new receive buffer for function: " << receive_function;
                 buffer = m_receive_buffer.emplace(
                         receive_function, std::make_shared<CircularBuffer<transbot_sdk::Package>>(10)).first;
             }
             // Push the package to the received buffer
+            LOG(INFO) << "Push a package to the receive buffer.";
             buffer->second->push(package);
         }
         else
@@ -198,4 +201,5 @@ void Protocol::receive_thread()
             LOG(WARNING) << "Invalid data received from hardware, returned bytes: " << receive << ".";
         }
     }
+    delete single_buffer;
 }
