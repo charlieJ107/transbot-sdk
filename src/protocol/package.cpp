@@ -2,7 +2,6 @@
 #include <mutex>
 #include "package.hpp"
 #include <cstring>
-#include <iostream>
 
 namespace transbot_sdk
 {
@@ -34,12 +33,7 @@ namespace transbot_sdk
         data[1] = 0xFE;
         data[2] = length;
         data[3] = static_cast<uint8_t>(send_function);
-        // Print the setted data:
-        std::cout << "Created a package: ";
-        std::cout << "Direction: 0x" << std::hex << (int)m_direction << ", ";
-        std::cout << "Function: 0x" << std::hex << (int)m_function.send_function << ", ";
-        std::cout << "Length: " << (int)length << ", ";
-        std::cout << std::endl;
+
     }
 
     Package::Package(RECEIVE_FUNCTION receive_function)
@@ -61,19 +55,15 @@ namespace transbot_sdk
         data[1] = 0xFD; // Header 1
         data[2] = length;
         data[3] = static_cast<uint8_t>(receive_function);
-        ;
-        // Print the setted data:
-        std::cout << "Created a package: ";
-        std::cout << "Direction: 0x" << std::hex << (int)m_direction << ", ";
-        std::cout << "Function: 0x" << std::hex << (int)m_function.receive_function << ", ";
-        std::cout << "Length: " << (int)length << ", ";
-        std::cout << std::endl;
     }
-    
+
     Package::~Package()
     {
         // Since c++0x, delete[] nullptr is allowed.
-        delete[] data;
+        if (data != nullptr)
+        {
+            delete[] data;
+        }
     }
 
     bool Package::set_data(uint8_t *data_to_set)
@@ -102,16 +92,9 @@ namespace transbot_sdk
         else
         {
             LOG(ERROR) << "Invalid direction: " << (int)data_to_set[1] << "!=" << m_direction;
-            std::cout << "Invalid direction: 0x" << std::hex << (int)data_to_set[1] << "!= 0x" << std::hex << (int)m_direction << std::endl;
             return false;
         }
-        // Print the data to set
-        std::cout << "Data to set: ";
-        for (int i = 0; i < length; i++)
-        {
-            std::cout << "0x" << std::hex << (int)data_to_set[i] << " ";
-        }
-        std::cout << std::endl;
+
         memcpy(this->data + 4, data_to_set + 4, length - 4);
         calculate_checksum();
         data_set = true;

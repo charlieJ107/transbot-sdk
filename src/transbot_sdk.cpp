@@ -41,7 +41,7 @@ namespace transbot_sdk
                        << "Linear velocity: " << static_cast<int>(linear_velocity)
                        << "Angular velocity: " << static_cast<int>(angular_velocity);
         }
-        LOG(INFO) << "Set chassis motion successfully. Delete data.";
+        
         delete data;
     }
 
@@ -70,7 +70,7 @@ namespace transbot_sdk
                        << "Channel: " << static_cast<int>(channel)
                        << "Angle: " << angle;
         }
-        LOG(INFO) << "Set camara angle successfully. Delete data.";
+        
         delete data;
     }
 
@@ -119,7 +119,7 @@ namespace transbot_sdk
                        << "Id: " << id
                        << "R: " << r << "G: " << g << "B: " << b;
         }
-        LOG(INFO) << "Set led strip successfully. Delete data.";
+        
         delete data;
     }
 
@@ -154,7 +154,7 @@ namespace transbot_sdk
                        << "Effect: " << effect
                        << "Velocity: " << velocity << "Param: " << param;
         }
-        LOG(INFO) << "Set led strip effect successfully. Delete data.";
+        
         delete data;
     }
 
@@ -180,7 +180,7 @@ namespace transbot_sdk
             LOG(ERROR) << "Set beep failed."
                        << "Duration: " << duration;
         }
-        LOG(INFO) << "Set beep successfully. Delete data.";
+        
         delete data;
     }
 
@@ -207,7 +207,7 @@ namespace transbot_sdk
             LOG(ERROR) << "Set light failed."
                        << "Lightness: " << lightness;
         }
-        LOG(INFO) << "Set light successfully. Delete data.";
+        
         delete data;
     }
 
@@ -229,7 +229,7 @@ namespace transbot_sdk
             LOG(ERROR) << "Set gyro assist failed."
                        << "Enable: " << enable;
         }
-        LOG(INFO) << "Set gyro assist successfully. Delete data.";
+        
         delete data;
     }
 
@@ -255,7 +255,7 @@ namespace transbot_sdk
             LOG(ERROR) << "Move straight failed."
                        << "Speed: " << speed;
         }
-        LOG(INFO) << "Move straight successfully. Delete data.";
+        
         delete data;
     }
 
@@ -276,7 +276,7 @@ namespace transbot_sdk
             LOG(ERROR) << "Set servo torque failed."
                        << "Enable: " << enable;
         }
-        LOG(INFO) << "Set servo torque successfully. Delete data.";
+        
         delete data;
     }
 
@@ -402,7 +402,7 @@ namespace transbot_sdk
                        << "Joint2: " << joint2 << "\n"
                        << "Joint3: " << joint3 << "\n";
         }
-        LOG(INFO) << "Set all arm servo angle successfully. Delete data.";
+        
         delete data;
     }
 
@@ -418,8 +418,9 @@ namespace transbot_sdk
         else
         {
             LOG(ERROR) << "Get firmware version failed.";
+            return "Failed";
         }
-        LOG(INFO) << "Get firmware version successfully. Delete data.";
+        
         delete data;
         // Take response
         auto response = protocol.take(FIRMWARE_VERSION);
@@ -448,7 +449,7 @@ namespace transbot_sdk
         {
             LOG(ERROR) << "Get yaw angle failed.";
         }
-        LOG(INFO) << "Get yaw angle successfully. Delete data.";
+        
         delete data;
         // Take response
         auto response = protocol.take(YAW_ANGLE);
@@ -475,7 +476,7 @@ namespace transbot_sdk
         {
             LOG(ERROR) << "Get servo position failed.";
         }
-        LOG(INFO) << "Get servo position successfully. Delete data.";
+        
         delete data;
         // Take response
         auto response = protocol.take(ARM_SERVO_POSITION);
@@ -493,36 +494,32 @@ namespace transbot_sdk
 
     Motion_Info Transbot::get_motion_info()
     {
-        auto response = protocol.take(MOTION_STATUS);
+        std::shared_ptr<transbot_sdk::Package> response = protocol.take(MOTION_STATUS);
         if (response == nullptr)
         {
             LOG(ERROR) << "Get motion info failed.";
             return Motion_Info((int8_t)0, (int16_t)0, (int16_t)0, (int16_t)0, (int16_t)0, (int16_t)0, (int16_t)0, (int16_t)0, (uint8_t)0);
         }
-        auto linear_velocity = reinterpret_cast<int8_t *>(response->get_data_ptr()[4]);
-        auto angular_velocity = reinterpret_cast<int16_t *>(response->get_data_ptr()[5]);
-        auto acc_x = reinterpret_cast<int16_t *>(response->get_data_ptr()[7]);
-        auto acc_y = reinterpret_cast<int16_t *>(response->get_data_ptr()[9]);
-        auto acc_z = reinterpret_cast<int16_t *>(response->get_data_ptr()[11]);
-        auto gyro_x = reinterpret_cast<int16_t *>(response->get_data_ptr()[13]);
-        auto gyro_y = reinterpret_cast<int16_t *>(response->get_data_ptr()[15]);
-        auto gyro_z = reinterpret_cast<int16_t *>(response->get_data_ptr()[17]);
-        auto battery_voltage = reinterpret_cast<uint8_t *>(response->get_data_ptr()[19]);
+        uint8_t* data_ptr = response->get_data_ptr();
+        int8_t linear_velocity = reinterpret_cast<int8_t*>(data_ptr+4)[0];
+        auto angular_velocity = reinterpret_cast<int16_t*>(data_ptr+5)[0];
+        auto acc_x = reinterpret_cast<int16_t*>(data_ptr+7)[0];
+        auto acc_y = reinterpret_cast<int16_t*>(data_ptr+9)[0];
+        auto acc_z = reinterpret_cast<int16_t*>(data_ptr+11)[0];
+        auto gyro_x = reinterpret_cast<int16_t*>(data_ptr+13)[0];
+        auto gyro_y = reinterpret_cast<int16_t*>(data_ptr+15)[0];
+        auto gyro_z = reinterpret_cast<int16_t*>(data_ptr+17)[0];
+        auto battery_voltage = reinterpret_cast<uint8_t*>(data_ptr+19)[0];
 
-        LOG(INFO) << "Linear velocity: " << linear_velocity << "; Angular velocity: " << angular_velocity
-                  << "; Acc x: " << acc_x << "; Acc y: " << acc_y << "; Acc z: " << acc_z
-                  << "; Gyro x: " << gyro_x << "; Gyro y: " << gyro_y << "; Gyro z: " << gyro_z
-                  << "; Battery voltage: " << battery_voltage;
-
-        return Motion_Info(static_cast<int>(*linear_velocity),
-                           static_cast<int>(*angular_velocity),
-                           static_cast<int>(*acc_x),
-                           static_cast<int>(*acc_y),
-                           static_cast<int>(*acc_z),
-                           static_cast<int>(*gyro_x),
-                           static_cast<int>(*gyro_y),
-                           static_cast<int>(*gyro_z),
-                           static_cast<int>(*battery_voltage));
+        return Motion_Info(static_cast<int>(linear_velocity),
+                           static_cast<int>(angular_velocity),
+                           static_cast<int>(acc_x),
+                           static_cast<int>(acc_y),
+                           static_cast<int>(acc_z),
+                           static_cast<int>(gyro_x),
+                           static_cast<int>(gyro_y),
+                           static_cast<int>(gyro_z),
+                           static_cast<int>(battery_voltage));
     }
 
     PID_Parameters Transbot::get_pid_parameters()
@@ -538,7 +535,7 @@ namespace transbot_sdk
         {
             LOG(ERROR) << "Get PID parameters failed.";
         }
-        LOG(INFO) << "Get PID parameters successfully. Delete data.";
+        
         delete data;
         // Take response
         auto response = protocol.take(PID_PARAM);
@@ -572,7 +569,7 @@ namespace transbot_sdk
         {
             LOG(ERROR) << "Get gyro assist status failed.";
         }
-        LOG(INFO) << "Get gyro assist status successfully. Delete data.";
+        
         delete data;
         // Take response
         auto response = protocol.take(GYRO_ASSIST_ENABLED);

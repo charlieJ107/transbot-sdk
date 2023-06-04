@@ -18,9 +18,6 @@ int main(int argc, char *argv[])
         LOG(ERROR) << "init failed";
         return -1;
     }
-    // Wait for packages to be received 5 second
-    LOG(INFO) << "Wait for packages to be received 5 second";
-    std::this_thread::sleep_for(std::chrono::seconds(5));
 
     // Get firmware version
     LOG(INFO) << "firmware version: " << sdk.get_firmware_version();
@@ -60,7 +57,7 @@ int main(int argc, char *argv[])
 
     // Beep 1 second
     sdk.set_beep(1);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::seconds(10));
     sdk.set_beep(0);
     
 

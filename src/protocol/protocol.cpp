@@ -2,7 +2,6 @@
 #include "protocol.hpp"
 #include "glog/logging.h"
 #include "hardware/serial_device.hpp"
-#include <iostream>
 
 Protocol::Protocol()
 {
@@ -10,9 +9,9 @@ Protocol::Protocol()
     m_is_running = false;
     m_receive_buffer_ptr = new uint8_t[transbot_sdk::MAX_PACKAGE_LEN];
     m_receive_buffer =
-            std::unordered_map<
-                    transbot_sdk::RECEIVE_FUNCTION,
-                    std::shared_ptr<CircularBuffer<transbot_sdk::Package>>>();
+        std::unordered_map<
+            transbot_sdk::RECEIVE_FUNCTION,
+            std::shared_ptr<CircularBuffer<std::shared_ptr<transbot_sdk::Package>>>>();
 }
 
 bool Protocol::init()
@@ -64,6 +63,8 @@ bool Protocol::send(const std::shared_ptr<transbot_sdk::Package> &package)
         LOG(ERROR) << "Package is not sent completely.";
         return false;
     }
+    // delay 40ms to wait for the hardware to process the package
+    std::this_thread::sleep_for(std::chrono::milliseconds(40));
     return true;
 }
 
@@ -83,23 +84,22 @@ std::shared_ptr<transbot_sdk::Package> Protocol::take(transbot_sdk::RECEIVE_FUNC
         return nullptr;
     }
     // Get a package from the receive buffer
-    std::shared_ptr<transbot_sdk::Package> package;
     try
     {
-        package = std::make_shared<transbot_sdk::Package>(m_receive_buffer.at(receive_function)->pop());
+        std::shared_ptr<transbot_sdk::Package> package = m_receive_buffer.at(receive_function)->pop();
+        // Check package data is set
+        if (!package->is_data_set())
+        {
+            LOG(ERROR) << "Package data is not set.";
+            return nullptr;
+        }
+        return package;
     }
     catch (std::out_of_range &e)
     {
         LOG(ERROR) << "Receive buffer is empty.";
         return nullptr;
     }
-    // Check package data is set
-    if (!package->is_data_set())
-    {
-        LOG(ERROR) << "Package data is not set.";
-        return nullptr;
-    }
-    return package;
 }
 
 Protocol::~Protocol()
@@ -121,7 +121,7 @@ void Protocol::receive_thread()
     while (m_is_running)
     {
         memset(m_receive_buffer_ptr, 0, transbot_sdk::MAX_PACKAGE_LEN);
-        
+
         int receive = 0;
         while (true)
         {
@@ -130,10 +130,9 @@ void Protocol::receive_thread()
             {
                 continue;
             }
-            if (*single_buffer == (uint8_t) 0xFF)
+            if (*single_buffer == (uint8_t)0xFF)
             {
                 // Find the header
-                std::cout << "Receive header." << std::endl;
                 m_receive_buffer_ptr[0] = *single_buffer;
                 receive = m_hardware->receive(single_buffer, 1);
                 if (receive <= 0)
@@ -141,33 +140,22 @@ void Protocol::receive_thread()
                     continue;
                 }
 
-                if (*single_buffer == (uint8_t) 0xFD)
+                if (*single_buffer == (uint8_t)0xFD)
                 {
                     // Find the second header
-                    std::cout << "Receive second header." << std::endl;
                     m_receive_buffer_ptr[1] = *single_buffer;
                     break;
                 }
                 else
                 {
-                    std::cout << "0x" << std::hex << (int) *single_buffer << " " << std::endl;
                     continue;
                 }
             }
-            std::cout << "0x" << std::hex << (int) *single_buffer << " is not a valid header" << std::endl;
         }
-        
+
         receive = m_hardware->receive(m_receive_buffer_ptr + 2, transbot_sdk::MAX_PACKAGE_LEN - 2);
         if (receive >= 0)
         {
-
-            LOG(INFO) << "Receive another " << receive << " bytes from hardware.";
-            for (int i = 0; i < receive + 2; i++)
-            {
-                std::cout << "0x" << std::hex << (int) m_receive_buffer_ptr[i] << " ";
-            }
-            std::cout << std::endl;
-
             // Get function type from the buffer[3]
             auto receive_function = static_cast<transbot_sdk::RECEIVE_FUNCTION>(m_receive_buffer_ptr[3]);
             // Check function type is valid
@@ -182,18 +170,17 @@ void Protocol::receive_thread()
                 receive_function = *it;
             }
             // Parse the package
-            transbot_sdk::Package package = transbot_sdk::Package(receive_function);
-            package.set_data(m_receive_buffer_ptr);
+            std::shared_ptr<transbot_sdk::Package> package = std::make_shared<transbot_sdk::Package>(receive_function);
+            package->set_data(m_receive_buffer_ptr);
             // Check receive buffer exists, if not, create one
             auto buffer = m_receive_buffer.find(receive_function);
             if (buffer == m_receive_buffer.end())
             {
                 LOG(INFO) << "Create a new receive buffer for function: " << receive_function;
                 buffer = m_receive_buffer.emplace(
-                        receive_function, std::make_shared<CircularBuffer<transbot_sdk::Package>>(10)).first;
+                                             receive_function, std::make_shared<CircularBuffer<std::shared_ptr<transbot_sdk::Package>>>(10))
+                             .first;
             }
-            // Push the package to the received buffer
-            LOG(INFO) << "Push a package to the receive buffer.";
             buffer->second->push(package);
         }
         else
