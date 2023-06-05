@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     LOG(INFO) << "firmware version: " << sdk.get_firmware_version();
     // Get motion info
     auto motion_info = sdk.get_motion_info();
-    LOG(INFO) << "motion info: " <<
+    LOG(INFO) << "motion info: \n" <<
               "angular_velocity: " << motion_info.angular_velocity << ", \n" <<
               "linear_velocity: " << motion_info.linear_velocity << ", \n" <<
               "x acc: " << motion_info.x_acceleration << ", \n" <<
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
               "battery voltage: " << motion_info.battery_voltage << ", \n";
 
     // Set arm position
-    // sdk.set_all_arm_servo_angle(90, 90, 90, 1000);
+    sdk.set_all_arm_servo_angle(90, 90, 90, 1000);
     // Get arm position:
     auto joint1 = sdk.get_servo_position(transbot_sdk::TRANSBOT_ARM_SERVO_ID::JOINT1);
     auto joint2 = sdk.get_servo_position(transbot_sdk::TRANSBOT_ARM_SERVO_ID::JOINT2);
@@ -43,21 +43,31 @@ int main(int argc, char *argv[])
     LOG(INFO) << "arm position: " << joint1 << ", " << joint2 << ", " << joint3;
 
     // Move straight
-    // sdk.move_straight(15);
-    // // Delay 1 second
-    // std::this_thread::sleep_for(std::chrono::seconds(1));
-    // // Stop
-    // sdk.move_straight(0);
-    // // Move back
-    // sdk.move_straight(-15);
-    // // Delay 1 second
-    // std::this_thread::sleep_for(std::chrono::seconds(1));
-    // // Stop
-    // sdk.move_straight(0);
+    sdk.move_straight(15);
+    // Delay 1 second
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    // Stop
+    sdk.move_straight(0);
+    // Move back
+    sdk.move_straight(-15);
+    // Delay 1 second
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    // Stop
+    sdk.move_straight(0);
+
+    // Turn a round
+    sdk.set_chassis_motion(15, 15);
+    // Delay 1 second
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    sdk.set_chassis_motion(-15, -15);
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    // Stop
+    sdk.set_chassis_motion(0, 0);
 
     // Beep 1 second
     sdk.set_beep(1);
-    std::this_thread::sleep_for(std::chrono::seconds(10));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     sdk.set_beep(0);
     
 

@@ -13,7 +13,7 @@ namespace transbot_sdk
      */
     typedef struct _pid_adjust
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x0A;
         const uint8_t function = 0x01;
         uint16_t P;
@@ -21,6 +21,13 @@ namespace transbot_sdk
         uint16_t D;
         uint8_t save;
         uint8_t checksum;
+        _pid_adjust(uint16_t P, uint16_t I, uint16_t D, uint8_t save)
+            : save(save), checksum(0){
+                // swap the high and low byte of P, I and D
+                this->P = (P << 8) | (P >> 8) * 1000;
+                this->I = (I << 8) | (I >> 8) * 1000;
+                this->D = (D << 8) | (D >> 8) * 1000;
+            };
     } PID_Adjust;
 
     /**
@@ -32,19 +39,22 @@ namespace transbot_sdk
      */
     typedef struct _move_control
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x06;
         const uint8_t function = 0x02;
-        uint8_t linear_velocity;
-        uint16_t angular_velocity;
+        int8_t linear_velocity;
+        int16_t angular_velocity;
         uint8_t checksum;
-        _move_control(uint8_t linear_velocity, uint16_t angular_velocity)
-            : linear_velocity(linear_velocity), angular_velocity(angular_velocity), checksum(0){};
+        _move_control(int8_t linear_velocity, int16_t angular_velocity){
+            this->linear_velocity = linear_velocity;
+            this->angular_velocity = angular_velocity;
+            this->checksum = (length + function + linear_velocity + (angular_velocity >> 8) + (angular_velocity & 0xff)) % 256;
+        };
     } Move_Control;
 
     typedef struct _pwm_servo_control
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x05;
         const uint8_t function = 0x03;
         uint8_t servo_id;
@@ -56,7 +66,7 @@ namespace transbot_sdk
 
     typedef struct _rgb_control
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x07;
         const uint8_t function = 0x04;
         // 0-16 or 0xff (for all)
@@ -71,7 +81,7 @@ namespace transbot_sdk
 
     typedef struct _rgb_effect
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x06;
         const uint8_t function = 0x05;
         // Range: 0-6;
@@ -87,7 +97,7 @@ namespace transbot_sdk
 
     typedef struct _buzzer
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x05;
         const uint8_t function = 0x06;
         // 0: OFF
@@ -96,12 +106,14 @@ namespace transbot_sdk
         uint16_t time;
         uint8_t checksum;
         _buzzer(uint16_t time)
-            : time(time), checksum(0){};
+            : checksum(0){
+                this->time = (time << 8) | (time >> 8);
+            };
     } Buzzer;
 
     typedef struct _led_light
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x04;
         const uint8_t function = 0x07;
         // How light it is 0-100
@@ -113,7 +125,7 @@ namespace transbot_sdk
 
     typedef struct _auto_msg_setting
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x04;
         const uint8_t function = 0x08;
         // 0x00: OFF
@@ -127,43 +139,23 @@ namespace transbot_sdk
             : enable(enable), save(save), checksum(0){};
     } Auto_Msg_Sending;
 
-    typedef struct _moving_data_callback
-    {
-        const uint16_t header = 0XFFFD;
-        const uint8_t length = 0x13;
-        const uint8_t function = 0x08;
-        // -45 - +45
-        int8_t linear_velocity;
-        // -200 - +200
-        int16_t angular_velocity;
-        uint16_t acc_x;
-        uint16_t acc_y;
-        uint16_t acc_z;
-        uint16_t gyro_x;
-        uint16_t gyro_y;
-        uint16_t gyro_z;
-        // 10 times
-        uint8_t battery_voltage;
-        uint8_t checksum;
-        _moving_data_callback(int8_t linear_velocity, int16_t angular_velocity, uint16_t acc_x, uint16_t acc_y, uint16_t acc_z, uint16_t gyro_x, uint16_t gyro_y, uint16_t gyro_z, uint8_t battery_voltage)
-            : linear_velocity(linear_velocity), angular_velocity(angular_velocity), acc_x(acc_x), acc_y(acc_y), acc_z(acc_z), gyro_x(gyro_x), gyro_y(gyro_y), gyro_z(gyro_z), battery_voltage(battery_voltage), checksum(0){};
-    } Moving_Msg_Callback;
-
     // For test moto ok
     typedef struct _pwm_velocity
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x09;
         uint8_t moto_id; // 0x01 or 0x02;
         int16_t pwm;     // -100 - +100
         uint8_t checksum;
         _pwm_velocity(uint8_t moto_id, int16_t pwm)
-            : moto_id(moto_id), pwm(pwm), checksum(0){};
+            : moto_id(moto_id), checksum(0){
+                this->pwm = (pwm << 8) | (pwm >> 8);
+            };
     } PWM_Velocity;
 
     typedef struct _min_velocity_limit
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x05;
         const uint8_t function = 0x0B;
         // 0-20
@@ -180,7 +172,7 @@ namespace transbot_sdk
 
     typedef struct _gyro_direction
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x05;
         const uint8_t function = 0x0D;
         // On: 0x01;
@@ -193,7 +185,7 @@ namespace transbot_sdk
 
     typedef struct _forward
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x04;
         const uint8_t function = 0x0D;
         // -45- +45
@@ -205,7 +197,7 @@ namespace transbot_sdk
 
     typedef struct _servo_control
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x08;
         const uint8_t function = 0x20;
         // 1-250 or 0xfe(all servo)
@@ -216,12 +208,14 @@ namespace transbot_sdk
         uint16_t time;
         uint8_t checksum;
         _servo_control(uint8_t servo_id, uint16_t target_position, uint16_t time)
-            : servo_id(servo_id), target_position(target_position), time(time), checksum(0){};
+            : servo_id(servo_id), target_position(target_position), checksum(0){
+                this->time = (time << 8) | (time >> 8);
+            };
     } Servo_Control;
 
     typedef struct _set_servo_bus_id
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x09;
         const uint8_t function = 0x21;
         // 0-250
@@ -236,7 +230,7 @@ namespace transbot_sdk
      */
     typedef struct _enable_servo_torque
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x04;
         const uint8_t function = 0x22;
         // 0: OFF
@@ -249,7 +243,7 @@ namespace transbot_sdk
 
     typedef struct _control_arm_joint_position
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x09;
         const uint8_t function = 0x23;
         // Fist joint, ID = 7, 96-4000
@@ -262,12 +256,17 @@ namespace transbot_sdk
         uint16_t time;
         uint8_t checksum;
         _control_arm_joint_position(uint16_t joint1, uint16_t joint2, uint16_t joint3, uint16_t time)
-            : joint1(joint1), joint2(joint2), joint3(joint3), time(time), checksum(0){};
+            : checksum(0){
+                this->joint1 = (joint1 << 8) | (joint1 >> 8);
+                this->joint2 = (joint2 << 8) | (joint2 >> 8);
+                this->joint3 = (joint3 << 8) | (joint3 >> 8);
+                this->time = (time << 8) | (time >> 8);
+            };
     } Control_Arm_Joint_Position;
 
     typedef struct _clear_flash_data
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x04;
         const uint8_t function = 0xA0;
         const uint8_t confirm = 0x5F;
@@ -280,7 +279,7 @@ namespace transbot_sdk
 
     typedef struct _read_data_request
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x05;
         const uint8_t function = 0x50;
         uint8_t data_type;
@@ -292,7 +291,7 @@ namespace transbot_sdk
 
     typedef struct _request_firmware_version
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x05;
         const uint8_t function = 0x50;
         const uint8_t data_type = 0x51;
@@ -304,7 +303,7 @@ namespace transbot_sdk
 
     typedef struct _firmware_version_response
     {
-        const uint16_t header = 0xFFFD;
+        const uint16_t header = 0xFDFF;
         const uint8_t length = 0XFD;
         const uint8_t data_type = 0x51;
         uint8_t major;
@@ -318,7 +317,7 @@ namespace transbot_sdk
     // Response with a uint16_t value
     typedef struct _request_yaw
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x05;
         const uint8_t function = 0x50;
         const uint8_t data_type = 0x52;
@@ -330,7 +329,7 @@ namespace transbot_sdk
 
     typedef struct _yaw_response
     {
-        const uint16_t header = 0xFFFD;
+        const uint16_t header = 0xFDFF;
         const uint8_t length = 0XFD;
         const uint8_t data_type = 0x52;
         // Unit is radian and has been scaled to 1000 times, divide by 1000 to get the real value
@@ -345,24 +344,24 @@ namespace transbot_sdk
     // response with am uint8_t for servo id and a uint16_t for position.
     typedef struct _request_servo_position
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x06;
-        const uint8_t function = 0x20;
-        const uint8_t data_type = 0x53;
+        const uint8_t function = 0x50;
+        const uint8_t data_type = 0x20;
         // 1-250
         uint8_t servo_id;
         uint8_t checksum;
 
         _request_servo_position(uint8_t servo_id) : servo_id(servo_id)
         {
-            checksum = header + length + function + data_type + servo_id;
+            checksum = (length + function + data_type + servo_id) % 256;
         }
     } Request_Servo_Position;
 
     typedef struct _servo_position_response
     {
-        const uint16_t header = 0xFFFD;
-        const uint8_t length = 0XFD;
+        const uint16_t header = 0xFDFF;
+        const uint8_t length = 0x06;
         const uint8_t data_type = 0x20;
         // 1-250
         uint8_t servo_id;
@@ -378,7 +377,7 @@ namespace transbot_sdk
     // uint8 for battery voltage
     typedef struct _request_movement_status
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x05;
         const uint8_t function = 0x50;
         const uint8_t data_type = 0x08;
@@ -390,7 +389,7 @@ namespace transbot_sdk
 
     typedef struct _movement_status_response
     {
-        uint16_t header = 0xFFFD;
+        uint16_t header = 0xFDFF;
         uint8_t length = 0x13;
         uint8_t data_type = 0x08;
         // -45-45
@@ -415,7 +414,7 @@ namespace transbot_sdk
 
     typedef struct _request_pid_parameters
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x05;
         const uint8_t function = 0x50;
         const uint8_t data_type = 0x01;
@@ -425,7 +424,7 @@ namespace transbot_sdk
 
     typedef struct _pid_parameters_response
     {
-        const uint16_t header = 0xFFFD;
+        const uint16_t header = 0xFDFF;
         const uint8_t length = 0XFD;
         const uint8_t data_type = 0x01;
         // 0-10000
@@ -444,7 +443,7 @@ namespace transbot_sdk
 
     typedef struct _request_gyro_assist
     {
-        const uint16_t header = 0xFFFE;
+        const uint16_t header = 0xFEFF;
         const uint8_t length = 0x05;
         const uint8_t function = 0x50;
         const uint8_t data_type = 0x0C;
@@ -454,7 +453,7 @@ namespace transbot_sdk
 
     typedef struct _gyro_assist_response
     {
-        const uint16_t header = 0xFFFD;
+        const uint16_t header = 0xFDFF;
         const uint8_t length = 0X04;
         const uint8_t data_type = 0x0C;
         // 0 or 1

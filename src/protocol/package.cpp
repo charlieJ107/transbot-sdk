@@ -26,12 +26,12 @@ namespace transbot_sdk
         m_function.send_function = send_function;
         data_set = false;
         checksum = 0;
-        length = SEND_PACKAGE_LEN.at(send_function);
+        length = SEND_PACKAGE_LEN.at(send_function)+2;
         data = new uint8_t[length];
         memset(data, 0, length);
         data[0] = 0xFF;
         data[1] = 0xFE;
-        data[2] = length;
+        data[2] = length-2;
         data[3] = static_cast<uint8_t>(send_function);
 
     }
@@ -48,12 +48,12 @@ namespace transbot_sdk
         m_function.receive_function = receive_function;
         data_set = false;
         checksum = 0;
-        length = RECEIVE_PACKAGE_LEN.at(receive_function);
+        length = RECEIVE_PACKAGE_LEN.at(receive_function)+2;
         data = new uint8_t[length];
         memset(data, 0, length);
         data[0] = 0xFF; // Header 0
         data[1] = 0xFD; // Header 1
-        data[2] = length;
+        data[2] = length-2;
         data[3] = static_cast<uint8_t>(receive_function);
     }
 

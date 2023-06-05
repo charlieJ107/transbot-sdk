@@ -7,17 +7,17 @@ namespace transbot_sdk
 {
     typedef struct _motion_info
     {
-        int linear_velocity;
-        int angular_velocity;
-        int x_acceleration;
-        int y_acceleration;
-        int z_acceleration;
-        int x_gyro;
-        int y_gyro;
-        int z_gyro;
-        int battery_voltage;
-        _motion_info(int linear_velocity, int angular_velocity, int x_acceleration, int y_acceleration,
-                     int z_acceleration, int x_gyro, int y_gyro, int z_gyro, int battery_voltage) : linear_velocity(linear_velocity), angular_velocity(angular_velocity),
+        double linear_velocity;
+        double angular_velocity;
+        double x_acceleration;
+        double y_acceleration;
+        double z_acceleration;
+        double x_gyro;
+        double y_gyro;
+        double z_gyro;
+        double battery_voltage;
+        _motion_info(double linear_velocity, double angular_velocity, double x_acceleration, double y_acceleration,
+                     double z_acceleration, double x_gyro, double y_gyro, double z_gyro, double battery_voltage) : linear_velocity(linear_velocity), angular_velocity(angular_velocity),
                                                                                                     x_acceleration(x_acceleration), y_acceleration(y_acceleration), z_acceleration(z_acceleration),
                                                                                                     x_gyro(x_gyro), y_gyro(y_gyro), z_gyro(z_gyro), battery_voltage(battery_voltage) {}
     } Motion_Info;

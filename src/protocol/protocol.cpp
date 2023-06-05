@@ -45,7 +45,7 @@ bool Protocol::send(const std::shared_ptr<transbot_sdk::Package> &package)
         return false;
     }
     // Check package is a valid length
-    if (transbot_sdk::SEND_PACKAGE_LEN.at(package->get_function().send_function) != package->get_length())
+    if (transbot_sdk::SEND_PACKAGE_LEN.at(package->get_function().send_function) + 2 != package->get_length())
     {
         LOG(ERROR) << "Package is not a valid send package. It has a wrong length.";
         return false;
