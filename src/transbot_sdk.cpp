@@ -4,6 +4,7 @@
 
 namespace transbot_sdk
 {
+
     bool Transbot::init()
     {
         return this->protocol.init();
@@ -11,28 +12,38 @@ namespace transbot_sdk
 
     void Transbot::set_chassis_motion(int linear_velocity, int angular_velocity)
     {
-        if (linear_velocity < -45 || linear_velocity > 45)
+        if (linear_velocity < -45)
         {
-            LOG(ERROR) << "Linear velocity out of range: " << linear_velocity;
-            return;
+            LOG(ERROR) << "Linear velocity out of range: " << linear_velocity << ", set to -45";
+            linear_velocity = -45;
         }
-        if (angular_velocity < -200 || angular_velocity > 200)
+        else if (linear_velocity > 45)
         {
-            LOG(ERROR) << "Angular velocity out of range: " << angular_velocity;
-            return;
+            LOG(ERROR) << "Linear velocity out of range: " << linear_velocity << ", set to 45";
+            linear_velocity = 45;
+        }
+        if (angular_velocity < -200)
+        {
+            LOG(ERROR) << "Angular velocity out of range: " << angular_velocity << ", set to -200";
+            angular_velocity = -200;
+        }
+        else if (angular_velocity > 200)
+        {
+            LOG(ERROR) << "Angular velocity out of range: " << angular_velocity << ", set to 200";
+            angular_velocity = 200;
         }
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_CHASSIS_MOTION);
-        auto data = new Move_Control(static_cast<uint8_t>(linear_velocity),
-                                     static_cast<uint16_t>(angular_velocity));
+            std::make_shared<Package>(SEND_FUNCTION::SET_CHASSIS_MOTION);
+        auto data = new Move_Control(static_cast<int8_t>(linear_velocity),
+                                     static_cast<int16_t>(angular_velocity));
 
         package->set_data(reinterpret_cast<uint8_t *>(data));
 
         if (this->protocol.send(package))
         {
-            LOG(INFO) << "Set chassis motion successfully."
-                      << "Linear velocity: " << static_cast<int>(linear_velocity)
-                      << "Angular velocity: " << static_cast<int>(angular_velocity);
+            LOG(INFO) << "Set chassis motion successfully. \n"
+                      << "Linear velocity: " << static_cast<int>(linear_velocity) << "\n"
+                      << "Angular velocity: " << static_cast<int>(angular_velocity) << "\n";
         }
         else
         {
@@ -40,6 +51,7 @@ namespace transbot_sdk
                        << "Linear velocity: " << static_cast<int>(linear_velocity)
                        << "Angular velocity: " << static_cast<int>(angular_velocity);
         }
+
         delete data;
     }
 
@@ -51,7 +63,7 @@ namespace transbot_sdk
             return;
         }
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_PWM_SERVO);
+            std::make_shared<Package>(SEND_FUNCTION::SET_PWM_SERVO);
         auto data = new PWM_Servo_Control(static_cast<uint8_t>(channel),
                                           static_cast<uint8_t>(angle));
 
@@ -68,6 +80,7 @@ namespace transbot_sdk
                        << "Channel: " << static_cast<int>(channel)
                        << "Angle: " << angle;
         }
+
         delete data;
     }
 
@@ -95,7 +108,7 @@ namespace transbot_sdk
         }
 
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_LED_STRIP);
+            std::make_shared<Package>(SEND_FUNCTION::SET_LED_STRIP);
 
         auto data = new RGB_Control(static_cast<uint8_t>(id),
                                     static_cast<uint8_t>(r),
@@ -116,6 +129,7 @@ namespace transbot_sdk
                        << "Id: " << id
                        << "R: " << r << "G: " << g << "B: " << b;
         }
+
         delete data;
     }
 
@@ -133,7 +147,7 @@ namespace transbot_sdk
         }
 
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_STRIP_EFFECT);
+            std::make_shared<Package>(SEND_FUNCTION::SET_STRIP_EFFECT);
         auto data = new RGB_Effect(static_cast<uint8_t>(effect),
                                    static_cast<uint8_t>(velocity),
                                    static_cast<uint8_t>(param));
@@ -150,6 +164,7 @@ namespace transbot_sdk
                        << "Effect: " << effect
                        << "Velocity: " << velocity << "Param: " << param;
         }
+
         delete data;
     }
 
@@ -162,8 +177,9 @@ namespace transbot_sdk
         }
 
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_BEEP);
-        auto data = new Buzzer(static_cast<uint8_t>(10 * duration));
+            std::make_shared<Package>(SEND_FUNCTION::SET_BEEP);
+
+        auto data = new Buzzer(static_cast<uint8_t>(duration));
         package->set_data(reinterpret_cast<uint8_t *>(data));
         if (this->protocol.send(package))
         {
@@ -175,6 +191,7 @@ namespace transbot_sdk
             LOG(ERROR) << "Set beep failed."
                        << "Duration: " << duration;
         }
+
         delete data;
     }
 
@@ -186,7 +203,7 @@ namespace transbot_sdk
             return;
         }
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_LIGHT);
+            std::make_shared<Package>(SEND_FUNCTION::SET_LIGHT);
 
         auto data = new LED_Light(static_cast<uint8_t>(lightness));
 
@@ -201,13 +218,14 @@ namespace transbot_sdk
             LOG(ERROR) << "Set light failed."
                        << "Lightness: " << lightness;
         }
+
         delete data;
     }
 
     void Transbot::enable_gyro_assist(bool enable)
     {
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_GYRO_ENABLE);
+            std::make_shared<Package>(SEND_FUNCTION::SET_GYRO_ENABLE);
         auto data = new Gyro_Direction(static_cast<uint8_t>(enable ? transbot_sdk::TRANSBOT_ENABLE::ENABLE
                                                                    : transbot_sdk::TRANSBOT_ENABLE::DISABLE));
 
@@ -222,6 +240,7 @@ namespace transbot_sdk
             LOG(ERROR) << "Set gyro assist failed."
                        << "Enable: " << enable;
         }
+
         delete data;
     }
 
@@ -233,7 +252,7 @@ namespace transbot_sdk
             return;
         }
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_MOTOR_FORWARD);
+            std::make_shared<Package>(SEND_FUNCTION::SET_MOTOR_FORWARD);
 
         auto data = new Forward(static_cast<int8_t>(speed));
         package->set_data(reinterpret_cast<uint8_t *>(data));
@@ -247,13 +266,14 @@ namespace transbot_sdk
             LOG(ERROR) << "Move straight failed."
                        << "Speed: " << speed;
         }
+
         delete data;
     }
 
     void Transbot::enable_servo_torque(bool enable)
     {
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_ARM_SERVO_TORQUE);
+            std::make_shared<Package>(SEND_FUNCTION::SET_ARM_SERVO_TORQUE);
         auto data = new Enable_Servo_Torque(static_cast<uint8_t>(enable ? transbot_sdk::TRANSBOT_ENABLE::ENABLE
                                                                         : transbot_sdk::TRANSBOT_ENABLE::DISABLE));
         package->set_data(reinterpret_cast<uint8_t *>(data));
@@ -267,6 +287,7 @@ namespace transbot_sdk
             LOG(ERROR) << "Set servo torque failed."
                        << "Enable: " << enable;
         }
+
         delete data;
     }
 
@@ -307,7 +328,7 @@ namespace transbot_sdk
         }
 
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_ARM_SERVO);
+            std::make_shared<Package>(SEND_FUNCTION::SET_ARM_SERVO);
 
         auto data = new Servo_Control(static_cast<uint8_t>(servoId),
                                       static_cast<uint16_t>(angle_to_pwm(angle, servoId)),
@@ -370,7 +391,7 @@ namespace transbot_sdk
         }
 
         auto package =
-            std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SET_ARM_MOTION);
+            std::make_shared<Package>(SEND_FUNCTION::SET_ARM_MOTION);
         auto data = new Control_Arm_Joint_Position(static_cast<uint16_t>(angle_to_pwm(joint1, TRANSBOT_ARM_SERVO_ID::JOINT1)),
                                                    static_cast<uint16_t>(angle_to_pwm(joint2, TRANSBOT_ARM_SERVO_ID::JOINT2)),
                                                    static_cast<uint16_t>(angle_to_pwm(joint3, TRANSBOT_ARM_SERVO_ID::JOINT3)),
@@ -382,22 +403,23 @@ namespace transbot_sdk
         {
             LOG(INFO) << "Set all arm servo angle successfully."
                       << "Joint1: " << joint1 << "\n"
-                      << "Joint2: " << joint2 << "\n" 
+                      << "Joint2: " << joint2 << "\n"
                       << "Joint3: " << joint3 << "\n";
         }
         else
         {
             LOG(ERROR) << "Set all arm servo angle failed."
                        << "Joint1: " << joint1 << "\n"
-                       << "Joint2: " << joint2 << "\n" 
+                       << "Joint2: " << joint2 << "\n"
                        << "Joint3: " << joint3 << "\n";
         }
+
         delete data;
     }
 
     std::string Transbot::get_firmware_version()
     {
-        auto package = std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SEND_REQUEST);
+        auto package = std::make_shared<Package>(SEND_FUNCTION::SEND_REQUEST);
         auto data = new Request_Firmware_Version;
         package->set_data(reinterpret_cast<uint8_t *>(data));
         if (protocol.send(package))
@@ -407,7 +429,9 @@ namespace transbot_sdk
         else
         {
             LOG(ERROR) << "Get firmware version failed.";
+            return "Failed";
         }
+
         delete data;
         // Take response
         auto response = protocol.take(FIRMWARE_VERSION);
@@ -425,7 +449,7 @@ namespace transbot_sdk
 
     int Transbot::get_yaw_angle()
     {
-        auto package = std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SEND_REQUEST);
+        auto package = std::make_shared<Package>(SEND_FUNCTION::SEND_REQUEST);
         auto data = new Request_Yaw;
         package->set_data(reinterpret_cast<uint8_t *>(data));
         if (protocol.send(package))
@@ -436,6 +460,7 @@ namespace transbot_sdk
         {
             LOG(ERROR) << "Get yaw angle failed.";
         }
+
         delete data;
         // Take response
         auto response = protocol.take(YAW_ANGLE);
@@ -451,7 +476,7 @@ namespace transbot_sdk
 
     int Transbot::get_servo_position(int channel)
     {
-        auto package = std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SEND_REQUEST);
+        auto package = std::make_shared<Package>(SEND_FUNCTION::SEND_REQUEST);
         auto data = new Request_Servo_Position(static_cast<uint8_t>(channel));
         package->set_data(reinterpret_cast<uint8_t *>(data));
         if (protocol.send(package))
@@ -462,6 +487,7 @@ namespace transbot_sdk
         {
             LOG(ERROR) << "Get servo position failed.";
         }
+
         delete data;
         // Take response
         auto response = protocol.take(ARM_SERVO_POSITION);
@@ -470,63 +496,72 @@ namespace transbot_sdk
             LOG(ERROR) << "Get servo position failed.";
             return -1;
         }
-        auto servo_id = response->get_data_ptr()[4];
-        auto position = reinterpret_cast<uint16_t *>(response->get_data_ptr()[5]);
-        LOG(INFO) << "Servo id: " << servo_id << "; Position: " << position;
-
-        return static_cast<int>(*position);
+        uint8_t* data_ptr = response->get_data_ptr();
+        uint8_t servo_id = data_ptr[4];
+        uint8_t low = data_ptr[5], high = data_ptr[6];
+        uint16_t position = (high << 8) | low;
+        LOG(INFO) << "Servo id: " << (int)servo_id << "; Position: " << position;
+        return static_cast<int>(position);
     }
 
     Motion_Info Transbot::get_motion_info()
     {
-        // auto package = std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SEND_REQUEST);
-        // auto data = new Request_Movement_Status;
-        // package->set_data(reinterpret_cast<uint8_t *>(data));
-        // if (protocol.send(package))
-        // {
-        //     LOG(INFO) << "Get motion info successfully.";
-        // }
-        // else
-        // {
-        //     LOG(ERROR) << "Get motion info failed.";
-        // }
-        // delete data;
-        // Take response
-        auto response = protocol.take(MOTION_STATUS);
+        std::shared_ptr<transbot_sdk::Package> response = protocol.take(MOTION_STATUS);
         if (response == nullptr)
         {
             LOG(ERROR) << "Get motion info failed.";
-            return Motion_Info((int8_t)0, (int16_t)0, (int16_t)0, (int16_t)0, (int16_t)0, (int16_t)0, (int16_t)0, (int16_t)0, (uint8_t)0);
+            return Motion_Info(0,0,0,0,0,0,0,0,0);
         }
-        auto linear_velocity = reinterpret_cast<int8_t *>(response->get_data_ptr()[4]);
-        auto angular_velocity = reinterpret_cast<int16_t *>(response->get_data_ptr()[5]);
-        auto acc_x = reinterpret_cast<int16_t *>(response->get_data_ptr()[7]);
-        auto acc_y = reinterpret_cast<int16_t *>(response->get_data_ptr()[9]);
-        auto acc_z = reinterpret_cast<int16_t *>(response->get_data_ptr()[11]);
-        auto gyro_x = reinterpret_cast<int16_t *>(response->get_data_ptr()[13]);
-        auto gyro_y = reinterpret_cast<int16_t *>(response->get_data_ptr()[15]);
-        auto gyro_z = reinterpret_cast<int16_t *>(response->get_data_ptr()[17]);
-        auto battery_voltage = reinterpret_cast<uint8_t *>(response->get_data_ptr()[19]);
+        int8_t *data_ptr = reinterpret_cast<int8_t *>(response->get_data_ptr());
 
-        LOG(INFO) << "Linear velocity: " << linear_velocity << "; Angular velocity: " << angular_velocity
-                  << "; Acc x: " << acc_x << "; Acc y: " << acc_y << "; Acc z: " << acc_z
-                  << "; Gyro x: " << gyro_x << "; Gyro y: " << gyro_y << "; Gyro z: " << gyro_z
-                  << "; Battery voltage: " << battery_voltage;
+        int8_t linear_velocity_data = data_ptr[4];
 
-        return Motion_Info(static_cast<int>(*linear_velocity),
-                           static_cast<int>(*angular_velocity),
-                           static_cast<int>(*acc_x),
-                           static_cast<int>(*acc_y),
-                           static_cast<int>(*acc_z),
-                           static_cast<int>(*gyro_x),
-                           static_cast<int>(*gyro_y),
-                           static_cast<int>(*gyro_z),
-                           static_cast<int>(*battery_voltage));
+        uint8_t low = data_ptr[5], high = data_ptr[6];
+        int16_t angular_velocity_data = (high << 8) | low;
+
+        low = data_ptr[7]; high = data_ptr[8];
+        int16_t acc_x_data = (high << 8) | low;
+
+        low = data_ptr[9]; high = data_ptr[10];
+        int16_t acc_y_data = (high << 8) | low;
+
+        low = data_ptr[11]; high = data_ptr[12];
+        int16_t acc_z_data = (high << 8) | low;
+
+        low = data_ptr[13]; high = data_ptr[14];
+        int16_t gyro_x_data = (high << 8) | low;
+
+        low = data_ptr[15]; high = data_ptr[16];
+        int16_t gyro_y_data = (high << 8) | low;
+
+        low = data_ptr[17]; high = data_ptr[18];
+        int16_t gyro_z_data = (high << 8) | low;
+
+        uint8_t battery_voltage = reinterpret_cast<uint8_t *>(data_ptr + 19)[0];
+
+        double linear_velocit = linear_velocity_data/100.0;
+        double angular_velocity = angular_velocity_data/100.0;
+
+        double accel_ratio = 16384.0;
+        int acc_x = acc_x_data/accel_ratio;
+        int acc_y = acc_y_data/accel_ratio;
+        int acc_z = acc_z_data/accel_ratio;
+
+        double gyro_ratio = 1 / 65.5 / (180 / 3.1415926);
+        // double gyro_ratio = 1 / 16.4 / (180 / 3.1415926) // ±2
+        // double gyro_ratio = 1 / 32.8 / (180 / 3.1415926)
+
+        double gyro_x = gyro_x_data * gyro_ratio;
+        double gyro_y = gyro_y_data * gyro_ratio;
+        double gyro_z = gyro_z_data * gyro_ratio;
+        
+
+        return Motion_Info(linear_velocit, angular_velocity, acc_x, acc_y, acc_z, gyro_x, gyro_y, gyro_z, battery_voltage);
     }
 
     PID_Parameters Transbot::get_pid_parameters()
     {
-        auto package = std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SEND_REQUEST);
+        auto package = std::make_shared<Package>(SEND_FUNCTION::SEND_REQUEST);
         auto data = new Request_PID_Parameters;
         package->set_data(reinterpret_cast<uint8_t *>(data));
         if (protocol.send(package))
@@ -537,6 +572,7 @@ namespace transbot_sdk
         {
             LOG(ERROR) << "Get PID parameters failed.";
         }
+
         delete data;
         // Take response
         auto response = protocol.take(PID_PARAM);
@@ -559,7 +595,7 @@ namespace transbot_sdk
 
     bool Transbot::is_gyro_assist_enabled()
     {
-        auto package = std::make_shared<Package>(Direction::SEND, SEND_FUNCTION::SEND_REQUEST);
+        auto package = std::make_shared<Package>(SEND_FUNCTION::SEND_REQUEST);
         auto data = new Request_Gyro_Assist;
         package->set_data(reinterpret_cast<uint8_t *>(data));
         if (protocol.send(package))
@@ -570,6 +606,7 @@ namespace transbot_sdk
         {
             LOG(ERROR) << "Get gyro assist status failed.";
         }
+
         delete data;
         // Take response
         auto response = protocol.take(GYRO_ASSIST_ENABLED);

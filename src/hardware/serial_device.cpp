@@ -36,14 +36,17 @@ namespace transbot_sdk
         // Set stop bits to 1
         serial_port_settings.c_cflag &= ~CSTOPB;
 
-        // Set wait time to 40ms
-        serial_port_settings.c_cc[VTIME] = 4;
+        // Set wait time to 30ms
+        serial_port_settings.c_cc[VTIME] = 3;
         // Set minimum receive bytes to 4
-        serial_port_settings.c_cc[VMIN] = 4;
+        serial_port_settings.c_cc[VMIN] = 0;
 
         // Using raw mode
         serial_port_settings.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
         serial_port_settings.c_oflag &= ~OPOST;
+        // set up raw mode / no echo / binary
+        serial_port_settings.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
+        serial_port_settings.c_oflag &= ~OPOST; // make raw
 
         // Flush the input and output buffer
         tcflush(serial_file_descriptor, TCIFLUSH);
@@ -60,11 +63,8 @@ namespace transbot_sdk
 
     bool SerialDevice::open_device()
     {
-#ifdef __arm__
-        this->serial_file_descriptor = open(this->port_name.c_str(), O_RDWR | O_NBLOCK);
-#else
-        serial_file_descriptor = open(this->port_name.c_str(), O_RDWR | O_NOCTTY);
-#endif
+        serial_file_descriptor = open(this->port_name.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
+
         if (serial_file_descriptor < 0)
         {
             LOG(ERROR) << "Open serial device " << this->port_name << " failed.";
@@ -109,11 +109,6 @@ namespace transbot_sdk
             }
             LOG(INFO) << "Reconnect successfully.";
             read_bytes = read(serial_file_descriptor, buffer, max_length);
-        }
-
-        for (int i = 0; i < read_bytes; i++)
-        {
-            LOG(INFO) << "Receive: " << std::hex << buffer[i];
         }
         return read_bytes;
     }

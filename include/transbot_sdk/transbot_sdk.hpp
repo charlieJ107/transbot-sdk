@@ -6,7 +6,6 @@
 #include "../src/protocol/protocol.hpp"
 #include "glog/logging.h"
 
-
 namespace transbot_sdk
 {
     class Transbot
@@ -19,7 +18,6 @@ namespace transbot_sdk
         }
 
         ~Transbot() = default;
-
         /**
          * @brief Initialize the transbot sdk
          * @return true if success
@@ -141,7 +139,6 @@ namespace transbot_sdk
          */
         bool is_gyro_assist_enabled();
 
-
     private:
         Protocol protocol;
         int angle_offset[3] = {0, 0, 0};
@@ -150,4 +147,4 @@ namespace transbot_sdk
     };
 } // transbot_sdk
 
-#endif //TRANSBOT_TRANSBOT_SDK_HPP
+#endif // TRANSBOT_TRANSBOT_SDK_HPP
