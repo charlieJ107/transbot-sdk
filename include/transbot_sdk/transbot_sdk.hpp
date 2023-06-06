@@ -29,7 +29,7 @@ namespace transbot_sdk
          * @param linear_velocity -45-45
          * @param angular_velocity -200-200
          */
-        void set_chassis_motion(int linear_velocity, int angular_velocity);
+        void set_chassis_motion(double linear_velocity, double angular_velocity);
 
         /**
          * @brief Set the camara servo angle

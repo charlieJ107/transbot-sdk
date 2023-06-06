@@ -10,32 +10,32 @@ namespace transbot_sdk
         return this->protocol.init();
     }
 
-    void Transbot::set_chassis_motion(int linear_velocity, int angular_velocity)
+    void Transbot::set_chassis_motion(double linear_velocity, double angular_velocity)
     {
-        if (linear_velocity < -45)
+        if (linear_velocity < -0.45)
         {
             LOG(ERROR) << "Linear velocity out of range: " << linear_velocity << ", set to -45";
-            linear_velocity = -45;
+            linear_velocity = -0.45;
         }
-        else if (linear_velocity > 45)
+        else if (linear_velocity > 0.45)
         {
             LOG(ERROR) << "Linear velocity out of range: " << linear_velocity << ", set to 45";
-            linear_velocity = 45;
+            linear_velocity = 0.45;
         }
-        if (angular_velocity < -200)
+        if (angular_velocity < -2.00)
         {
             LOG(ERROR) << "Angular velocity out of range: " << angular_velocity << ", set to -200";
-            angular_velocity = -200;
+            angular_velocity = -2.00;
         }
-        else if (angular_velocity > 200)
+        else if (angular_velocity > 2.00)
         {
             LOG(ERROR) << "Angular velocity out of range: " << angular_velocity << ", set to 200";
-            angular_velocity = 200;
+            angular_velocity = 2.00;
         }
         auto package =
             std::make_shared<Package>(SEND_FUNCTION::SET_CHASSIS_MOTION);
-        auto data = new Move_Control(static_cast<int8_t>(linear_velocity),
-                                     static_cast<int16_t>(angular_velocity));
+        auto data = new Move_Control(static_cast<int8_t>(100*linear_velocity),
+                                     static_cast<int16_t>(100*angular_velocity));
 
         package->set_data(reinterpret_cast<uint8_t *>(data));
 
