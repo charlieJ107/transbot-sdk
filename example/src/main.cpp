@@ -1,7 +1,7 @@
 #include <glog/logging.h>
-#include "transbot_sdk.hpp"
+#include "transbot_sdk/transbot_sdk.hpp"
 
-int main(int argc, char *argv[])
+int main([[maybe_unused]]int argc, char *argv[])
 {
     FLAGS_logtostderr = true;
     FLAGS_colorlogtostderr = true;
