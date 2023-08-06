@@ -26,3 +26,8 @@ target_include_directories(transbot_sdk PRIVATE src ${glog_INCLUDE_DIRECTORY})
 target_link_libraries(transbot_sdk PRIVATE ${glog_LIBRARIES})
 target_link_libraries(example PRIVATE ${glog_LIBRARIES})
 target_link_libraries(example PUBLIC transbot_sdk)
+
+install(TARGETS
+  transbot_sdk
+  DESTINATION lib
+)
